@@ -6,28 +6,25 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import ee.eee.testwebsock.websockets.data.FrameMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
 import org.springframework.web.socket.*;
-import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
 
 @Slf4j
-public class WebSocketCarController extends TextWebSocketHandler {
+
+public class WebSocketCarHandler implements WebSocketHandler {
 	private static final Set<WebSocketSession> clients = Collections.synchronizedSet(new HashSet<>());
 	ObjectMapper objectMapper = new ObjectMapper();
 	private byte[] kolo;
 	private byte[] triangle;
 	private byte[] triangle2;
 
-	private boolean is = true;
 
-	public WebSocketCarController() {
+	public WebSocketCarHandler() {
 		kolo = null;
 		try {
 			kolo = new ClassPathResource("kolo.png").getInputStream().readAllBytes();
@@ -37,22 +34,11 @@ public class WebSocketCarController extends TextWebSocketHandler {
 				Exception e) {
 			log.error(e.getMessage());
 		}
-		Runnable a = () -> {
-			while (is) {
-				try {
-					sendImageToAllUsers(null);
-					Thread.sleep(1000);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
-		};
-		Thread t = new Thread(a);
-		t.start();
 	}
 
 	@Override
 	public void afterConnectionEstablished(WebSocketSession session) {
+		log.error(session.getAttributes().get("auctionId") + "HERE >");
 		clients.add(session);
 		log.error(session.getId() + " has opened a connection " + session.getUri());
 
