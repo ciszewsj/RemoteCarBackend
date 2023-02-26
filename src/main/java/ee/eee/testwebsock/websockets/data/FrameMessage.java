@@ -4,5 +4,5 @@ import lombok.Data;
 
 @Data
 public class FrameMessage {
-	public byte[] image;
+	private byte[] image;
 }
