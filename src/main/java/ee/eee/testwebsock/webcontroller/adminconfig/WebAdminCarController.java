@@ -9,12 +9,12 @@ import org.springframework.web.bind.annotation.*;
 public class WebAdminCarController {
 
 	@GetMapping
-	public void getCars() {
+	public void getAdminCars() {
 
 	}
 
 	@GetMapping("/{id}")
-	public void getCar(@PathVariable String id) {
+	public void getAdminCar(@PathVariable String id) {
 
 	}
 

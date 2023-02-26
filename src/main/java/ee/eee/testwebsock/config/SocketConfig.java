@@ -1,5 +1,8 @@
-package ee.eee.testwebsock.web;
+package ee.eee.testwebsock.config;
 
+import ee.eee.testwebsock.websockets.websocket.WebSocketCarHandler;
+import ee.eee.testwebsock.websockets.websocket.car.CarControllerUseCase;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,7 +19,9 @@ import java.util.Map;
 @Slf4j
 @Configuration
 @EnableWebSocket
+@RequiredArgsConstructor
 public class SocketConfig implements WebSocketConfigurer {
+
 	@Override
 	public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
 		registry.addHandler(getWsEndpoint(), "/echo/*").setAllowedOriginPatterns("*").addInterceptors(auctionInterceptor());

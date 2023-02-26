@@ -1,7 +1,8 @@
-package ee.eee.testwebsock.websockets.websocket;
+package ee.eee.testwebsock.websockets.websocket.car;
 
+import ee.eee.testwebsock.websockets.data.ControlMessage;
+import ee.eee.testwebsock.websockets.websocket.user.UserControllerUseCase;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 import org.springframework.web.socket.*;
 import org.springframework.web.socket.client.WebSocketClient;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
@@ -9,6 +10,7 @@ import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ExecutionException;
 
 @Slf4j
@@ -18,6 +20,9 @@ public class CarClient {
 	private WebSocketHandler webSocketHandler;
 
 	private WebSocketSession socketSession;
+	private UserControllerUseCase userController;
+
+	private ControlMessage lastControlMessage;
 
 	public CarClient() {
 		try {
@@ -34,7 +39,8 @@ public class CarClient {
 
 				@Override
 				public void handleMessage(WebSocketSession session, WebSocketMessage<?> message) {
-					log.error(message.toString());
+//					log.error(message.toString());
+					userController.sendFrameToUsers(message.toString().getBytes(StandardCharsets.UTF_8));
 				}
 
 				@Override

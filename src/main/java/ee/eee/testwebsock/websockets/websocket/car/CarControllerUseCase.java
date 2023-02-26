@@ -1,4 +1,4 @@
-package ee.eee.testwebsock.websockets.websocket;
+package ee.eee.testwebsock.websockets.websocket.car;
 
 import ee.eee.testwebsock.websockets.data.ControlMessage;
 
@@ -8,9 +8,9 @@ public interface CarControllerUseCase {
 
 	void addNewCar();
 
-	void configNewCar();
+	void configCar() throws IOException;
 
 	void releaseCar();
 
-	void controlCar(ControlMessage controlMessage) throws IOException;
+	void controlCar(ControlMessage controlMessage);
 }

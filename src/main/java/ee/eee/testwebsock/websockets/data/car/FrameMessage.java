@@ -1,4 +1,4 @@
-package ee.eee.testwebsock.websockets.data;
+package ee.eee.testwebsock.websockets.data.car;
 
 import lombok.Data;
 
