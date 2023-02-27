@@ -40,7 +40,7 @@ public class CarController implements CarControllerUseCase {
 
 	@Override
 	public void addNewCar() {
-		carClient = new CarClient();
+		carClient = new CarClient(userControllerUseCase);
 		controlCar(new ControlMessage());
 		controlFunction();
 	}

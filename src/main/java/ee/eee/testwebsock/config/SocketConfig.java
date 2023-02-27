@@ -1,7 +1,7 @@
 package ee.eee.testwebsock.config;
 
-import ee.eee.testwebsock.websockets.websocket.WebSocketCarHandler;
-import ee.eee.testwebsock.websockets.websocket.car.CarControllerUseCase;
+import ee.eee.testwebsock.websockets.websocket.user.WebSocketCarHandler;
+import ee.eee.testwebsock.websockets.websocket.user.UserControllerUseCase;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -21,6 +21,8 @@ import java.util.Map;
 @EnableWebSocket
 @RequiredArgsConstructor
 public class SocketConfig implements WebSocketConfigurer {
+
+	private final UserControllerUseCase userControllerUseCase;
 
 	@Override
 	public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
@@ -54,6 +56,6 @@ public class SocketConfig implements WebSocketConfigurer {
 
 	@Bean
 	public WebSocketCarHandler getWsEndpoint() {
-		return new WebSocketCarHandler();
+		return new WebSocketCarHandler(userControllerUseCase);
 	}
 }

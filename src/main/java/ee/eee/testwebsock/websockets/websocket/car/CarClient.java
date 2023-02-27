@@ -24,7 +24,8 @@ public class CarClient {
 
 	private ControlMessage lastControlMessage;
 
-	public CarClient() {
+	public CarClient(UserControllerUseCase userController) {
+		this.userController = userController;
 		try {
 			this.uri = new URI("ws://localhost:8000/");
 			this.client = new StandardWebSocketClient();
