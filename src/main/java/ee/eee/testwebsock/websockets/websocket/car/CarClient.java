@@ -86,6 +86,7 @@ public class CarClient {
 
 	public void connect() {
 		try {
+			log.error("Client : ? {}", client);
 			client.execute(this.webSocketHandler, null, uri).get();
 		} catch (ExecutionException | InterruptedException e) {
 			log.error("Could not start car", e);

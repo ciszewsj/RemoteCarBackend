@@ -41,7 +41,7 @@ public class CarController implements CarControllerUseCase {
 		if (!carClientMap.get(id).isConnected()) {
 			carClientMap.get(id).connect();
 		} else {
-			throw new IllegalStateException("Car is already connected");
+			throw new WebControllerException(WebControllerException.ExceptionStatus.CAR_IS_RUNNING);
 		}
 	}
 
@@ -80,10 +80,8 @@ public class CarController implements CarControllerUseCase {
 
 	@Override
 	public void deleteCar(Long id) {
-		CarClient car = carClientMap.get(id);
-		if (car == null) {
-			throw new WebControllerException(WebControllerException.ExceptionStatus.CAR_NOT_FOUND_IN_CONTROLLER);
-		} else if (car.isConnected()) {
+		CarClient car = getCarWSById(id);
+		if (car.isConnected()) {
 			throw new WebControllerException(WebControllerException.ExceptionStatus.CAR_IS_RUNNING);
 		}
 		carClientMap.remove(id);
@@ -91,7 +89,7 @@ public class CarController implements CarControllerUseCase {
 
 	@Override
 	public boolean isCarRunning(Long id) {
-		return false;
+		return getCarWSById(id).isConnected();
 	}
 
 
