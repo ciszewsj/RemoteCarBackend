@@ -26,7 +26,7 @@ public class SocketConfig implements WebSocketConfigurer {
 
 	@Override
 	public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-		registry.addHandler(getWsEndpoint(), "/echo/*").setAllowedOriginPatterns("*").addInterceptors(auctionInterceptor());
+		registry.addHandler(getWsEndpoint(), "/car/*").setAllowedOriginPatterns("*").addInterceptors(auctionInterceptor());
 	}
 
 	@Bean
@@ -39,11 +39,11 @@ public class SocketConfig implements WebSocketConfigurer {
 			                               WebSocketHandler wsHandler, Map<String, Object> attributes) {
 
 				String path = request.getURI().getPath();
-				String auctionId = path.substring(path.lastIndexOf('/') + 1);
+				String carId = path.substring(path.lastIndexOf('/') + 1);
 
-				attributes.put("auctionId", auctionId);
+				attributes.put("carId", carId);
 
-				log.info(auctionId);
+				log.info(carId);
 				return true;
 			}
 

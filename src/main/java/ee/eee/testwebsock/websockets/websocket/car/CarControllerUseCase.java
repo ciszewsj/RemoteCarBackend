@@ -1,16 +1,23 @@
 package ee.eee.testwebsock.websockets.websocket.car;
 
+import ee.eee.testwebsock.database.data.CarEntity;
 import ee.eee.testwebsock.websockets.data.ControlMessage;
 
 import java.io.IOException;
 
 public interface CarControllerUseCase {
 
-	void addNewCar();
+	void addNewCar(CarEntity car);
 
-	void configCar() throws IOException;
+	void connectCar(Long id);
 
-	void releaseCar();
+	void configCar(CarEntity car);
 
-	void controlCar(ControlMessage controlMessage);
+	void releaseCar(Long id);
+
+	void controlCar(Long id, ControlMessage controlMessage);
+
+	void deleteCar(Long id);
+
+	boolean isCarRunning(Long id);
 }
