@@ -1,5 +1,6 @@
 package ee.eee.testwebsock.config;
 
+import ee.eee.testwebsock.websockets.websocket.car.CarControllerUseCase;
 import ee.eee.testwebsock.websockets.websocket.user.WebSocketCarHandler;
 import ee.eee.testwebsock.websockets.websocket.user.UserControllerUseCase;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +24,7 @@ import java.util.Map;
 public class SocketConfig implements WebSocketConfigurer {
 
 	private final UserControllerUseCase userControllerUseCase;
+	private final CarControllerUseCase carControllerUseCase;
 
 	@Override
 	public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
@@ -32,8 +34,6 @@ public class SocketConfig implements WebSocketConfigurer {
 	@Bean
 	public HandshakeInterceptor auctionInterceptor() {
 		return new HandshakeInterceptor() {
-
-
 			@Override
 			public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response,
 			                               WebSocketHandler wsHandler, Map<String, Object> attributes) {
@@ -56,6 +56,6 @@ public class SocketConfig implements WebSocketConfigurer {
 
 	@Bean
 	public WebSocketCarHandler getWsEndpoint() {
-		return new WebSocketCarHandler(userControllerUseCase);
+		return new WebSocketCarHandler(userControllerUseCase, carControllerUseCase);
 	}
 }

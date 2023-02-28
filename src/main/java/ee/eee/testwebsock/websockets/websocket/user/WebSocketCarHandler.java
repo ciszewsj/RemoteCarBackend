@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ee.eee.testwebsock.websockets.data.ControlMessage;
 import ee.eee.testwebsock.websockets.data.user.UserControlMessage;
+import ee.eee.testwebsock.websockets.websocket.car.CarControllerUseCase;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.socket.*;
@@ -17,10 +18,11 @@ import java.io.IOException;
 public class WebSocketCarHandler implements WebSocketHandler {
 	ObjectMapper objectMapper = new ObjectMapper();
 	private final UserControllerUseCase userController;
+	private final CarControllerUseCase carController;
 
 	@Override
 	public void afterConnectionEstablished(WebSocketSession session) {
-		log.error(session.getAttributes().get("auctionId") + "HERE >");
+		log.error(session.getAttributes().get("carId") + "HERE >");
 		userController.addSession(session);
 		log.error(session.getId() + " has opened a connection " + session.getUri());
 
@@ -43,6 +45,11 @@ public class WebSocketCarHandler implements WebSocketHandler {
 
 		if (userControlMessage.getType().equals(UserControlMessage.UserControlMessageType.CONTROL_MESSAGE)) {
 			ControlMessage controlMessage = objectMapper.readValue(userControlMessage.getData().toString(), ControlMessage.class);
+			try {
+				carController.controlCar((long) session.getAttributes().get("carId"), controlMessage);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 

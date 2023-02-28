@@ -1,5 +1,9 @@
 package ee.eee.testwebsock.websockets.websocket.car;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import ee.eee.testwebsock.utils.WebControllerException;
+import ee.eee.testwebsock.websockets.data.ControlMessage;
+import ee.eee.testwebsock.websockets.data.car.CarControlMessage;
 import ee.eee.testwebsock.websockets.websocket.user.UserControllerUseCase;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ClassPathResource;
@@ -18,6 +22,9 @@ public class CarClient {
 	private URI uri;
 
 	private final int tickRate = 20;
+	private final ObjectMapper objectMapper = new ObjectMapper();
+
+	private final CarControlMessage<ControlMessage> carControlMessage = new CarControlMessage<>(CarControlMessage.CarControlMessageType.CONTROL_MESSAGE, null);
 
 	private final WebSocketClient client;
 	private final WebSocketHandler webSocketHandler;
@@ -28,6 +35,10 @@ public class CarClient {
 	private ScheduledFuture<?> controlFuture;
 
 	private Integer fps;
+
+	private ControlMessage currentControlMessage;
+
+	private Long currentMessageTime;
 
 	public CarClient(String uri, Integer fps, UserControllerUseCase userController) {
 		try {
@@ -73,17 +84,22 @@ public class CarClient {
 
 	}
 
-	public void connect() throws ExecutionException, InterruptedException {
-
-		client.execute(this.webSocketHandler, null, uri).get();
-
+	public void connect() {
+		try {
+			client.execute(this.webSocketHandler, null, uri).get();
+		} catch (ExecutionException | InterruptedException e) {
+			log.error("Could not start car", e);
+			throw new WebControllerException(WebControllerException.ExceptionStatus.CAR_START_ERROR);
+		}
 	}
 
 	public void disconnect() {
 		try {
 			socketSession.close();
+			controlFuture.cancel(true);
 		} catch (IOException e) {
-			e.printStackTrace();
+			log.error("Could not stop car", e);
+			throw new WebControllerException(WebControllerException.ExceptionStatus.CAR_STOP_ERROR);
 		}
 	}
 
@@ -99,7 +115,12 @@ public class CarClient {
 		ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 		return executor.scheduleAtFixedRate(() -> {
 			try {
-				this.sendCommand(new ClassPathResource("kolo.png").getInputStream().toString());
+				if (currentControlMessage == null) {
+					carControlMessage.setData(new ControlMessage());
+				} else {
+					carControlMessage.setData(currentControlMessage);
+				}
+				this.sendCommand(objectMapper.writeValueAsString(carControlMessage));
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -107,4 +128,7 @@ public class CarClient {
 		}, 0, 1000 / tickRate, TimeUnit.MILLISECONDS);
 	}
 
+	public boolean isConnected() {
+		return socketSession != null && socketSession.isOpen();
+	}
 }

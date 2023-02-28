@@ -15,7 +15,7 @@ public interface CarControllerUseCase {
 
 	void releaseCar(Long id);
 
-	void controlCar(Long id, ControlMessage controlMessage);
+	void controlCar(Long id, ControlMessage controlMessage) throws IOException;
 
 	void deleteCar(Long id);
 
