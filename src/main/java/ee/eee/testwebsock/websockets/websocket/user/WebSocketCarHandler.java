@@ -22,12 +22,9 @@ public class WebSocketCarHandler implements WebSocketHandler {
 
 	@Override
 	public void afterConnectionEstablished(WebSocketSession session) {
-		log.error(session.getAttributes().get("carId") + "HERE >");
 		userController.addSession(session);
-		log.error(session.getId() + " has opened a connection " + session.getUri());
-
+		log.info(session.getId() + " has opened a connection " + session.getUri());
 		try {
-
 			WebSocketMessage<String> msg = new TextMessage("Connection Established");
 			session.sendMessage(msg);
 		} catch (IOException ex) {
@@ -37,12 +34,7 @@ public class WebSocketCarHandler implements WebSocketHandler {
 
 	@Override
 	public void handleMessage(WebSocketSession session, WebSocketMessage<?> message) throws JsonProcessingException {
-		log.error("Message from " + session.getId() + ": " + message.getPayload());
-
 		UserControlMessage<?> userControlMessage = objectMapper.readValue(message.getPayload().toString(), UserControlMessage.class);
-
-		log.error("??? TYPE IS {}", userControlMessage.getType());
-
 		if (userControlMessage.getType().equals(UserControlMessage.UserControlMessageType.CONTROL_MESSAGE)) {
 			ControlMessage controlMessage = objectMapper.readValue(userControlMessage.getData().toString(), ControlMessage.class);
 			try {
@@ -61,7 +53,6 @@ public class WebSocketCarHandler implements WebSocketHandler {
 	@Override
 	public void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus) {
 		userController.closeSession(session);
-
 		log.info("Session " + session.getId() + " has ended");
 	}
 
@@ -69,6 +60,5 @@ public class WebSocketCarHandler implements WebSocketHandler {
 	public boolean supportsPartialMessages() {
 		return false;
 	}
-
 
 }

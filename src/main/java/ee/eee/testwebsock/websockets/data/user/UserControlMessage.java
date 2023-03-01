@@ -13,6 +13,7 @@ public class UserControlMessage<T> {
 
 	public enum UserControlMessageType {
 		CONTROL_MESSAGE,
+		DISPLAY_MESSAGE,
 		INFO_MESSAGE
 	}
 }

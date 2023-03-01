@@ -23,6 +23,7 @@ import java.util.concurrent.*;
 public class CarClient {
 	private URI uri;
 
+	private final Long id;
 	private final int tickRate = 20;
 	private final long maxMessageDelay = 500;
 	private final ObjectMapper objectMapper = new ObjectMapper();
@@ -43,7 +44,8 @@ public class CarClient {
 
 	private Long currentMessageTime;
 
-	public CarClient(String uri, Integer fps, UserControllerUseCase userController) {
+	public CarClient(Long id, String uri, Integer fps, UserControllerUseCase userController) {
+		this.id = id;
 		try {
 			this.uri = new URI(uri);
 		} catch (URISyntaxException e) {
@@ -85,7 +87,7 @@ public class CarClient {
 					CarControlMessage<?> carControlMessage = objectMapper.readValue(message.getPayload().toString(), CarControlMessage.class);
 					if (carControlMessage.getType().equals(CarControlMessage.CarControlMessageType.DISPLAY_MESSAGE)) {
 						CarFrameMessage frameMessage = objectMapper.readValue(carControlMessage.getData().toString(), CarFrameMessage.class);
-						userController.sendFrameToUsers(frameMessage.getImage());
+						userController.sendFrameToUsers(id, frameMessage.getImage());
 					} else if (carControlMessage.getType().equals(CarControlMessage.CarControlMessageType.INFO_MESSAGE)) {
 						log.info("Received info from car");
 					}

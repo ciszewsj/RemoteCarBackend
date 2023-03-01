@@ -7,5 +7,5 @@ public interface UserControllerUseCase {
 
 	void closeSession(WebSocketSession session);
 
-	void sendFrameToUsers(byte[] frame);
+	void sendFrameToUsers(Long carId, byte[] frame);
 }

@@ -26,7 +26,7 @@ public class CarController implements CarControllerUseCase {
 
 	@Override
 	public void addNewCar(CarEntity car) {
-		CarClient carClient = new CarClient(car.getUrl(), car.getFps(), userControllerUseCase);
+		CarClient carClient = new CarClient(car.getId(), car.getUrl(), car.getFps(), userControllerUseCase);
 		carClientMap.put(car.getId(), carClient);
 	}
 
