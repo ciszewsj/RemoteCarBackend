@@ -6,6 +6,6 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class ControlMessage {
-	private Double verticalSpeed;
-	private Double horizontalSpeed;
+	private Double verticalSpeed = 0.0;
+	private Double horizontalSpeed = 0.0;
 }

@@ -1,16 +1,12 @@
 package ee.eee.testwebsock.websockets.websocket.car;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import ee.eee.testwebsock.database.data.CarEntity;
 import ee.eee.testwebsock.utils.WebControllerException;
 import ee.eee.testwebsock.websockets.data.ControlMessage;
-import ee.eee.testwebsock.websockets.data.car.CarConfigMessage;
-import ee.eee.testwebsock.websockets.data.car.CarControlMessage;
 import ee.eee.testwebsock.websockets.websocket.user.UserControllerUseCase;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,11 +17,9 @@ public class CarController implements CarControllerUseCase {
 	private final Map<Long, CarClient> carClientMap;
 	private final UserControllerUseCase userControllerUseCase;
 
-	private final ObjectMapper objectMapper;
 
 	public CarController(UserControllerUseCase userControllerUseCase) {
 		carClientMap = new HashMap<>();
-		this.objectMapper = new ObjectMapper();
 		this.userControllerUseCase = userControllerUseCase;
 	}
 
@@ -38,8 +32,9 @@ public class CarController implements CarControllerUseCase {
 
 	@Override
 	public void connectCar(Long id) {
-		if (!carClientMap.get(id).isConnected()) {
-			carClientMap.get(id).connect();
+		CarClient car = getCarWSById(id);
+		if (!car.isConnected()) {
+			car.connect();
 		} else {
 			throw new WebControllerException(WebControllerException.ExceptionStatus.CAR_IS_RUNNING);
 		}
@@ -47,35 +42,22 @@ public class CarController implements CarControllerUseCase {
 
 	@Override
 	public void releaseCar(Long id) {
-		carClientMap.get(id).disconnect();
+		getCarWSById(id).disconnect();
 	}
 
 	@Override
 	public void configCar(CarEntity car) {
-		CarControlMessage<CarConfigMessage> carControlMessage =
-				new CarControlMessage<>(
-						CarControlMessage.CarControlMessageType.CONFIG_MESSAGE,
-						CarConfigMessage.builder()
-								.fps(car.getFps())
-								.build()
-				);
+		getCarWSById(car.getId()).configure(car.getUrl(), car.getFps());
 	}
 
 
 	@Override
 	public void controlCar(Long id, ControlMessage controlMessage) {
-		CarClient car = carClientMap.get(id);
-		if (car != null) {
-			if (car.isConnected()) {
-				try {
-					carClientMap.get(id).sendCommand("commandSend");
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-			throw new IllegalStateException("Car not connected");
+		CarClient car = getCarWSById(id);
+		if (car.isConnected()) {
+			car.controlCar(controlMessage);
 		}
-		throw new IllegalStateException("Car not exists");
+		throw new WebControllerException(WebControllerException.ExceptionStatus.CAR_IS_NOT_RUNNING);
 	}
 
 	@Override
@@ -97,7 +79,7 @@ public class CarController implements CarControllerUseCase {
 		if (carClientMap.containsKey(id)) {
 			return carClientMap.get(id);
 		}
-		throw new IllegalArgumentException("Could not find car with id: " + id);
+		throw new WebControllerException(WebControllerException.ExceptionStatus.CAR_NOT_FOUND);
 	}
 
 }

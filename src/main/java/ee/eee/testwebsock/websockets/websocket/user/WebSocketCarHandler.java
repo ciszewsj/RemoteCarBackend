@@ -27,10 +27,10 @@ public class WebSocketCarHandler implements WebSocketHandler {
 		log.error(session.getId() + " has opened a connection " + session.getUri());
 
 		try {
+
 			WebSocketMessage<String> msg = new TextMessage("Connection Established");
 			session.sendMessage(msg);
 		} catch (IOException ex) {
-			log.error("Not Working ");
 			ex.printStackTrace();
 		}
 	}
@@ -55,14 +55,14 @@ public class WebSocketCarHandler implements WebSocketHandler {
 
 	@Override
 	public void handleTransportError(WebSocketSession session, Throwable exception) {
-
+		log.error("session handleTransportError", exception);
 	}
 
 	@Override
 	public void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus) {
 		userController.closeSession(session);
 
-		log.error("Session " + session.getId() + " has ended");
+		log.info("Session " + session.getId() + " has ended");
 	}
 
 	@Override

@@ -1,7 +1,7 @@
 package ee.eee.testwebsock.websockets.websocket.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import ee.eee.testwebsock.websockets.data.car.FrameMessage;
+import ee.eee.testwebsock.websockets.data.car.CarFrameMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
@@ -31,7 +31,7 @@ public class UserController implements UserControllerUseCase {
 
 	@Override
 	public void sendFrameToUsers(byte[] frame) {
-		FrameMessage frameMessage = new FrameMessage();
+		CarFrameMessage frameMessage = new CarFrameMessage();
 		frameMessage.setImage(frame);
 		clients.forEach(client -> {
 			try {
