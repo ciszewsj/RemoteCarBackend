@@ -57,6 +57,8 @@ public class CarClient {
 
 		this.webSocketHandler = webSocketHandler();
 
+		this.currentMessageTime = 0L;
+
 	}
 
 	private WebSocketHandler webSocketHandler() {
@@ -78,6 +80,7 @@ public class CarClient {
 				} catch (IOException e) {
 					log.error("Could not send config message", e);
 				}
+				log.info("?????");
 				controlFuture = controlFunction();
 			}
 
@@ -144,13 +147,16 @@ public class CarClient {
 		if (socketSession != null) {
 			socketSession.sendMessage(new TextMessage(command));
 		} else {
+			log.error("Connection not ready yet");
 			throw new NullPointerException("Connection not ready yet");
 		}
 	}
 
 	private ScheduledFuture<?> controlFunction() {
 		ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+		log.info("Define control executor");
 		return executor.scheduleAtFixedRate(() -> {
+			log.info("Send control");
 			try {
 				if (new Date().getTime() > currentMessageTime + maxMessageDelay) {
 					carControlMessage.setData(new ControlMessage());
@@ -159,6 +165,8 @@ public class CarClient {
 				}
 				this.sendCommand(objectMapper.writeValueAsString(carControlMessage));
 			} catch (IOException e) {
+				log.error("Exception runtime", e);
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 
