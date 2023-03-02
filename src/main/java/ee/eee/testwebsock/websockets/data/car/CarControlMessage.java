@@ -11,12 +11,6 @@ public class CarControlMessage<T> {
 	private CarControlMessageType type;
 	private T data;
 
-
-//	public CarControlMessage(CarControlMessageType type, T data) {
-//		this.type = type;
-//		this.data = data;
-//	}
-
 	public enum CarControlMessageType {
 		CONTROL_MESSAGE,
 		CONFIG_MESSAGE,
