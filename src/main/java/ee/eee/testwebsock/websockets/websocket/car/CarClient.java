@@ -85,10 +85,11 @@ public class CarClient {
 
 			@Override
 			public void handleMessage(WebSocketSession session, WebSocketMessage<?> message) {
+				log.debug("Received message : {}", message.getPayload());
 				try {
 					CarControlMessage<?> carControlMessage = objectMapper.readValue(message.getPayload().toString(), CarControlMessage.class);
 					if (carControlMessage.getType().equals(CarControlMessage.CarControlMessageType.DISPLAY_MESSAGE)) {
-						CarFrameMessage frameMessage = objectMapper.readValue(carControlMessage.getData().toString(), CarFrameMessage.class);
+						CarFrameMessage frameMessage = objectMapper.convertValue(carControlMessage.getData(), CarFrameMessage.class);
 						userController.sendFrameToUsers(id, frameMessage.getImage());
 					} else if (carControlMessage.getType().equals(CarControlMessage.CarControlMessageType.INFO_MESSAGE)) {
 						log.info("Received info from car");
