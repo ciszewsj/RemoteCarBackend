@@ -1,7 +1,9 @@
 package ee.eee.testwebsock.webcontroller.adminconfig;
 
 import ee.eee.testwebsock.database.CarEntityRepository;
+import ee.eee.testwebsock.database.CarImplService;
 import ee.eee.testwebsock.database.data.CarEntity;
+import ee.eee.testwebsock.database.data.CarStatusEntity;
 import ee.eee.testwebsock.utils.WebControllerException;
 import ee.eee.testwebsock.webcontroller.adminconfig.requests.AddCarRequest;
 import ee.eee.testwebsock.websockets.websocket.car.CarControllerUseCase;
@@ -19,6 +21,7 @@ public class WebAdminCarController {
 
 	private final CarEntityRepository carRepository;
 	private final CarControllerUseCase carController;
+	private final CarImplService carImplService;
 
 	@GetMapping
 	public List<CarEntity> getAdminCars() {
@@ -37,10 +40,10 @@ public class WebAdminCarController {
 		car.setName(addCarRequest.getName());
 		car.setUrl(addCarRequest.getUrl());
 		car.setFps(addCarRequest.getFps());
-		car.setStatus(CarEntity.ConnectionStatus.DISCONNECTED);
 		car = carRepository.save(car);
 
 		carController.addNewCar(car);
+		carImplService.addCarStatus(car.getId(), CarStatusEntity.Status.CREATED);
 	}
 
 	@PutMapping("/{id}")

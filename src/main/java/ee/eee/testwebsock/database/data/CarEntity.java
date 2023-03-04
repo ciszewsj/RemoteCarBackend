@@ -23,7 +23,7 @@ public class CarEntity {
 
 	private Integer fps;
 
-	private ConnectionStatus status;
+	private ConnectionStatus status = CarEntity.ConnectionStatus.DISCONNECTED;
 
 	@ManyToMany
 	private List<CarStatusEntity> carStatusEntityList = new ArrayList<>();

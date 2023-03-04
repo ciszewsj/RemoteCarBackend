@@ -4,6 +4,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import lombok.Setter;
 
 import java.util.Date;
 
@@ -13,16 +14,18 @@ public class CarStatusEntity {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 
-	private Date date;
+	private Date date = new Date();
 
+	@Setter
 	private Status status;
 
 	public enum Status {
 		CREATED,
+		LOADED,
 		CONNECTED,
 		DISCONNECTED,
 		CONNECTION_FAILURE,
-		SEND_CONFIG
+		CONFIGURE
 
 	}
 }

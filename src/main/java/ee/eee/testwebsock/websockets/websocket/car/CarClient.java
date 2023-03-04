@@ -2,6 +2,8 @@ package ee.eee.testwebsock.websockets.websocket.car;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import ee.eee.testwebsock.database.CarImplService;
+import ee.eee.testwebsock.database.data.CarStatusEntity;
 import ee.eee.testwebsock.utils.WebControllerException;
 import ee.eee.testwebsock.websockets.data.ControlMessage;
 import ee.eee.testwebsock.websockets.data.car.CarConfigMessage;
@@ -22,12 +24,19 @@ import java.util.concurrent.*;
 @Slf4j
 public class CarClient {
 	private URI uri;
-
 	private final Long id;
+	private Integer fps;
+
+
 	private final int tickRate = 20;
 	private final long maxMessageDelay = 500;
-	private final ObjectMapper objectMapper = new ObjectMapper();
+	private Long currentMessageTime;
+	private ControlMessage currentControlMessage;
 
+	private final CarImplService carImplService;
+
+
+	private final ObjectMapper objectMapper;
 	private final CarControlMessage<ControlMessage> carControlMessage = new CarControlMessage<>(CarControlMessage.CarControlMessageType.CONTROL_MESSAGE, null);
 
 	private final WebSocketClient client;
@@ -35,16 +44,10 @@ public class CarClient {
 
 	private WebSocketSession socketSession;
 	private final UserControllerUseCase userController;
-
 	private ScheduledFuture<?> controlFuture;
 
-	private Integer fps;
 
-	private ControlMessage currentControlMessage;
-
-	private Long currentMessageTime;
-
-	public CarClient(Long id, String uri, Integer fps, UserControllerUseCase userController) {
+	public CarClient(Long id, String uri, Integer fps, UserControllerUseCase userController, CarImplService carImplService) {
 		this.id = id;
 		try {
 			this.uri = new URI(uri);
@@ -58,6 +61,8 @@ public class CarClient {
 		this.webSocketHandler = webSocketHandler();
 
 		this.currentMessageTime = 0L;
+		this.carImplService = carImplService;
+		this.objectMapper = new ObjectMapper();
 
 	}
 
@@ -120,16 +125,26 @@ public class CarClient {
 
 	public void connect() {
 		try {
-			log.error("Client : ? {}", client);
 			client.execute(this.webSocketHandler, null, uri).get();
+
+			carImplService.turnCarOn(id);
+			carImplService.addCarStatus(id, CarStatusEntity.Status.CONNECTED);
 		} catch (ExecutionException | InterruptedException e) {
 			log.error("Could not start car", e);
+
+			carImplService.turnCarOff(id);
+			carImplService.addCarStatus(id, CarStatusEntity.Status.CONNECTION_FAILURE);
+
 			throw new WebControllerException(WebControllerException.ExceptionStatus.CAR_START_ERROR);
 		}
 	}
 
 	public void disconnect() {
 		try {
+
+			carImplService.turnCarOff(id);
+			carImplService.addCarStatus(id, CarStatusEntity.Status.DISCONNECTED);
+
 			socketSession.close();
 			controlFuture.cancel(true);
 		} catch (IOException e) {
@@ -182,6 +197,7 @@ public class CarClient {
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
 		}
+		carImplService.addCarStatus(id, CarStatusEntity.Status.CONFIGURE);
 	}
 
 	public boolean isConnected() {
