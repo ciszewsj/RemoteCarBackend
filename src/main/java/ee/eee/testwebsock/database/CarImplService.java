@@ -14,13 +14,14 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class CarImplService {
 	private final CarEntityRepository carEntityRepository;
+	private final CarStatusEntityRepository carStatusEntityRepository;
 
 	public void addCarStatus(Long carId, CarStatusEntity.Status status) {
 		CarEntity car = carEntityRepository.findById(carId).orElseThrow(new WebControllerException(WebControllerException.ExceptionStatus.CAR_NOT_FOUND));
 
 		CarStatusEntity statusEntity = new CarStatusEntity();
-
 		statusEntity.setStatus(status);
+		statusEntity = carStatusEntityRepository.save(statusEntity);
 
 		car.getCarStatusEntityList().add(statusEntity);
 	}
