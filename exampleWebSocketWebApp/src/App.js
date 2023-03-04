@@ -10,7 +10,7 @@ function App() {
     let [image, setImage] = useState("");
 
     useEffect(() => {
-        let url = 'ws://localhost:8080/echo/'
+        let url = 'ws://localhost:8080/cars/1'
         console.log("Execute?")
         let websocket = new WebSocket(url)
         websocket.onopen = () => {
@@ -18,14 +18,23 @@ function App() {
             // websocket.send("COnnnected")
         };
         websocket.onmessage = (e) => {
-            console.log("Recived : " + e.data);
             setLastMessage("Recived : " + e.data)
             let obj = JSON.parse(e.data)
-            if (obj.image) {
-                setImage(obj.image)
+            if (obj.type === "DISPLAY_MESSAGE") {
+                if (obj.data) {
+                    if (obj.data.frame) {
+                        setImage(obj.data.frame)
+                    }
+                }
+            } else {
+                console.log(obj)
+
             }
-            console.log(obj)
+
         };
+        websocket.onclose = (e) => {
+            console.log("Disconnected")
+        }
         setWs(websocket);
         return () => {
             websocket.close();

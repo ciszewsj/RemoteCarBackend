@@ -20,4 +20,6 @@ public interface CarControllerUseCase {
 	void deleteCar(Long id);
 
 	boolean isCarRunning(Long id);
+
+	boolean isCarExists(Long id);
 }

@@ -31,20 +31,18 @@ public class SocketConfig implements WebSocketConfigurer {
 		registry.addHandler(getWsEndpoint(), "/cars/*").setAllowedOriginPatterns("*").addInterceptors(auctionInterceptor());
 	}
 
-	@Bean
-	public HandshakeInterceptor auctionInterceptor() {
+	private HandshakeInterceptor auctionInterceptor() {
 		return new HandshakeInterceptor() {
 			@Override
 			public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response,
 			                               WebSocketHandler wsHandler, Map<String, Object> attributes) {
-				log.info("?");
-
 				String path = request.getURI().getPath();
-				String carId = path.substring(path.lastIndexOf('/') + 1);
-
-				attributes.put("carId", carId);
-
-				log.info(carId);
+				try {
+					Long carId = Long.valueOf(path.substring(path.lastIndexOf('/') + 1));
+					attributes.put("carId", carId);
+				} catch (Exception e) {
+					log.error("Could not read carId", e);
+				}
 				return true;
 			}
 
@@ -57,7 +55,6 @@ public class SocketConfig implements WebSocketConfigurer {
 
 	@Bean
 	public WebSocketHandler getWsEndpoint() {
-		log.error("CREATED>?");
 		return new WebSocketCarHandler(userControllerUseCase, carControllerUseCase);
 	}
 }

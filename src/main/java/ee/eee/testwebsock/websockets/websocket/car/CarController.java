@@ -82,4 +82,9 @@ public class CarController implements CarControllerUseCase {
 		throw new WebControllerException(WebControllerException.ExceptionStatus.CAR_NOT_FOUND);
 	}
 
+	@Override
+	public boolean isCarExists(Long id) {
+		return carClientMap.containsKey(id);
+	}
+
 }

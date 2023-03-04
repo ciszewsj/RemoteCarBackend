@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ee.eee.testwebsock.websockets.data.ControlMessage;
 import ee.eee.testwebsock.websockets.data.user.UserControlMessage;
+import ee.eee.testwebsock.websockets.data.user.UserInfoMessage;
 import ee.eee.testwebsock.websockets.websocket.car.CarControllerUseCase;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,14 +23,46 @@ public class WebSocketCarHandler implements WebSocketHandler {
 
 	@Override
 	public void afterConnectionEstablished(WebSocketSession session) {
-		userController.addSession(session);
-		log.info(session.getId() + " has opened a connection " + session.getUri());
-		try {
-			WebSocketMessage<String> msg = new TextMessage("Connection Established");
-			session.sendMessage(msg);
-		} catch (IOException ex) {
-			ex.printStackTrace();
+		log.info(session.getId() + " has opened a connection " + session.getUri() + " to car " + session.getAttributes().get("carId"));
+
+		if (session.getAttributes().get("carId") == null
+				|| !carController.isCarExists((Long) session.getAttributes().get("carId"))
+				|| !carController.isCarRunning((Long) session.getAttributes().get("carId"))
+		) {
+			UserControlMessage<UserInfoMessage> controlMessage = new UserControlMessage<>(
+					UserControlMessage.UserControlMessageType.INFO_MESSAGE,
+					UserInfoMessage.builder()
+							.msg(UserInfoMessage.UserInfoType.CAR_NOT_EXISTS)
+							.build()
+			);
+			try {
+				WebSocketMessage<String> msg = new TextMessage(objectMapper.writeValueAsString(controlMessage));
+				session.sendMessage(msg);
+			} catch (IOException e) {
+				e.printStackTrace();
+			} finally {
+				try {
+					session.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		} else {
+			userController.addSession(session);
+			UserControlMessage<UserInfoMessage> controlMessage = new UserControlMessage<>(
+					UserControlMessage.UserControlMessageType.INFO_MESSAGE,
+					UserInfoMessage.builder()
+							.msg(UserInfoMessage.UserInfoType.CONNECTED_SUCCESSFULLY)
+							.build()
+			);
+			try {
+				WebSocketMessage<String> msg = new TextMessage(objectMapper.writeValueAsString(controlMessage));
+				session.sendMessage(msg);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
+
 	}
 
 	@Override
