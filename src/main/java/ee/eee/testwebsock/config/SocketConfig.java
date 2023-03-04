@@ -1,8 +1,8 @@
 package ee.eee.testwebsock.config;
 
 import ee.eee.testwebsock.websockets.websocket.car.CarControllerUseCase;
-import ee.eee.testwebsock.websockets.websocket.user.WebSocketCarHandler;
 import ee.eee.testwebsock.websockets.websocket.user.UserControllerUseCase;
+import ee.eee.testwebsock.websockets.websocket.user.WebSocketCarHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -18,8 +18,8 @@ import org.springframework.web.socket.server.HandshakeInterceptor;
 import java.util.Map;
 
 @Slf4j
-@Configuration
 @EnableWebSocket
+@Configuration
 @RequiredArgsConstructor
 public class SocketConfig implements WebSocketConfigurer {
 
@@ -37,6 +37,7 @@ public class SocketConfig implements WebSocketConfigurer {
 			@Override
 			public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response,
 			                               WebSocketHandler wsHandler, Map<String, Object> attributes) {
+				log.info("?");
 
 				String path = request.getURI().getPath();
 				String carId = path.substring(path.lastIndexOf('/') + 1);
@@ -55,7 +56,8 @@ public class SocketConfig implements WebSocketConfigurer {
 	}
 
 	@Bean
-	public WebSocketCarHandler getWsEndpoint() {
+	public WebSocketHandler getWsEndpoint() {
+		log.error("CREATED>?");
 		return new WebSocketCarHandler(userControllerUseCase, carControllerUseCase);
 	}
 }
