@@ -28,7 +28,7 @@ public class SocketConfig implements WebSocketConfigurer {
 
 	@Override
 	public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-		registry.addHandler(getWsEndpoint(), "/car/*").setAllowedOriginPatterns("*").addInterceptors(auctionInterceptor());
+		registry.addHandler(getWsEndpoint(), "/cars/*").setAllowedOriginPatterns("*").addInterceptors(auctionInterceptor());
 	}
 
 	@Bean
