@@ -35,7 +35,7 @@ public class WebAdminCarController {
 	}
 
 	@PostMapping
-	public void addCar(@RequestBody AddCarRequest addCarRequest) {
+	public Long addCar(@RequestBody AddCarRequest addCarRequest) {
 		CarEntity car = new CarEntity();
 		car.setName(addCarRequest.getName());
 		car.setUrl(addCarRequest.getUrl());
@@ -44,10 +44,11 @@ public class WebAdminCarController {
 
 		carController.addNewCar(car);
 		carImplService.addCarStatus(car.getId(), CarStatusEntity.Status.CREATED);
+		return car.getId();
 	}
 
 	@PutMapping("/{id}")
-	public void updateCar(@PathVariable Long id, @RequestBody AddCarRequest addCarRequest) {
+	public Long updateCar(@PathVariable Long id, @RequestBody AddCarRequest addCarRequest) {
 		CarEntity car = carRepository.findById(id)
 				.orElseThrow(new WebControllerException(WebControllerException.ExceptionStatus.CAR_NOT_FOUND));
 		car.setName(addCarRequest.getName());
@@ -56,6 +57,7 @@ public class WebAdminCarController {
 		car = carRepository.save(car);
 
 		carController.configCar(car);
+		return car.getId();
 	}
 
 	@DeleteMapping("/{id}")
