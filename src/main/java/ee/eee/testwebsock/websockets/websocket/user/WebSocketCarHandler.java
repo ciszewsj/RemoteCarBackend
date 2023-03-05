@@ -75,6 +75,8 @@ public class WebSocketCarHandler implements WebSocketHandler {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+		} else if (userControlMessage.getType().equals(UserControlMessage.UserControlMessageType.GET_CONTROL)) {
+			log.info("Get Control");
 		}
 	}
 
