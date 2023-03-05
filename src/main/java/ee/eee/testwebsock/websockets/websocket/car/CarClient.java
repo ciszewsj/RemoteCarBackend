@@ -35,7 +35,6 @@ public class CarClient {
 
 	private final CarImplService carImplService;
 
-
 	private final ObjectMapper objectMapper;
 	private final CarControlMessage<ControlMessage> carControlMessage = new CarControlMessage<>(CarControlMessage.CarControlMessageType.CONTROL_MESSAGE, null);
 
@@ -63,7 +62,6 @@ public class CarClient {
 		this.currentMessageTime = 0L;
 		this.carImplService = carImplService;
 		this.objectMapper = new ObjectMapper();
-
 	}
 
 	private WebSocketHandler webSocketHandler() {
@@ -96,6 +94,8 @@ public class CarClient {
 					if (carControlMessage.getType().equals(CarControlMessage.CarControlMessageType.DISPLAY_MESSAGE)) {
 						CarFrameMessage frameMessage = objectMapper.convertValue(carControlMessage.getData(), CarFrameMessage.class);
 						userController.sendFrameToUsers(id, frameMessage.getImage());
+
+
 					} else if (carControlMessage.getType().equals(CarControlMessage.CarControlMessageType.INFO_MESSAGE)) {
 						log.info("Received info from car");
 					}

@@ -15,7 +15,10 @@ import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
 import org.springframework.web.socket.server.HandshakeInterceptor;
 
+import java.util.Arrays;
 import java.util.Map;
+
+import static ee.eee.testwebsock.utils.ImageObject.imageSizes;
 
 @Slf4j
 @EnableWebSocket
@@ -42,6 +45,17 @@ public class SocketConfig implements WebSocketConfigurer {
 					attributes.put("carId", carId);
 				} catch (Exception e) {
 					log.error("Could not read carId", e);
+				}
+				try {
+					String imgSize = request.getHeaders().getOrEmpty("resolution").get(0);
+					if (Arrays.stream(imageSizes).map(Enum::toString).anyMatch(str -> str.equals(imgSize))) {
+						attributes.put("resolution", imgSize);
+					} else {
+						log.info("Resolution is not set");
+					}
+				} catch (Exception e) {
+					log.error("Could not read resolution");
+
 				}
 				return true;
 			}
