@@ -83,6 +83,7 @@ public class CarClient {
 				} catch (IOException e) {
 					log.error("Could not send config message", e);
 				}
+				log.error("XD?");
 				controlFuture = controlFunction();
 			}
 
@@ -94,8 +95,6 @@ public class CarClient {
 					if (carControlMessage.getType().equals(CarControlMessage.CarControlMessageType.DISPLAY_MESSAGE)) {
 						CarFrameMessage frameMessage = objectMapper.convertValue(carControlMessage.getData(), CarFrameMessage.class);
 						userController.sendFrameToUsers(id, frameMessage.getImage());
-
-
 					} else if (carControlMessage.getType().equals(CarControlMessage.CarControlMessageType.INFO_MESSAGE)) {
 						log.info("Received info from car");
 					}
@@ -112,6 +111,7 @@ public class CarClient {
 			@Override
 			public void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus) {
 				log.warn("Car websocket session is closed");
+				carImplService.addCarStatus(id, CarStatusEntity.Status.DISCONNECTED);
 				socketSession = null;
 				controlFuture.cancel(true);
 			}
@@ -169,8 +169,10 @@ public class CarClient {
 
 	private ScheduledFuture<?> controlFunction() {
 		ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+		log.error("AM I HERE ?");
 		return executor.scheduleAtFixedRate(() -> {
 			try {
+				log.error("SEMDING");
 				if (new Date().getTime() > currentMessageTime + maxMessageDelay) {
 					carControlMessage.setData(new ControlMessage());
 				} else {
