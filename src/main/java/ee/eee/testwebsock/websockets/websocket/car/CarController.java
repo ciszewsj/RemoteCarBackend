@@ -104,7 +104,7 @@ public class CarController implements CarControllerUseCase {
 	}
 
 	@Override
-	public void takeSteering(Long carId, String websocketId) {
+	public void takeSteering(Long carId, String websocketId, String userId) {
 		if (carClientMap.containsKey(carId)) {
 		}
 	}

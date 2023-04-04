@@ -77,6 +77,7 @@ public class WebSocketCarHandler implements WebSocketHandler {
 			}
 		} else if (userControlMessage.getType().equals(UserControlMessage.UserControlMessageType.GET_CONTROL)) {
 			log.info("Get Control");
+			carController.takeSteering((long) session.getAttributes().get("carId"), session.getId(), "");
 		}
 	}
 

@@ -29,5 +29,5 @@ public interface CarControllerUseCase {
 
 	void rentACar(Long carId, String userId);
 
-	void takeSteering(Long carId, String websocketId);
+	void takeSteering(Long carId, String websocketId, String userId);
 }
