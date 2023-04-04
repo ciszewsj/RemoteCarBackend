@@ -1,12 +1,18 @@
 package ee.eee.testwebsock.webcontroller.cars;
 
+import ee.eee.testwebsock.database.CarEntityRepository;
 import ee.eee.testwebsock.database.CarImplService;
+import ee.eee.testwebsock.database.data.CarEntity;
 import ee.eee.testwebsock.database.data.CarStatusEntity;
 import ee.eee.testwebsock.webcontroller.cars.responses.CarConfigResponse;
+import ee.eee.testwebsock.webcontroller.cars.responses.CarRepresentationResponse;
 import ee.eee.testwebsock.websockets.websocket.car.CarControllerUseCase;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -16,15 +22,18 @@ public class WebCarController {
 
 	private final CarControllerUseCase carControllerUseCase;
 	private final CarImplService carImplService;
+	private final CarEntityRepository carEntityRepository;
 
 	@GetMapping
-	public void getCars() {
-
+	public List<CarRepresentationResponse> getCars() {
+		return carEntityRepository.findAll().stream()
+				.map(this::mapCarToRepresentation).collect(Collectors.toList());
 	}
 
 	@GetMapping("/{id}")
-	public void getCar(@PathVariable Long id) {
-
+	public CarRepresentationResponse getCar(@PathVariable Long id) {
+		CarEntity car = carEntityRepository.findById(id).orElseThrow();
+		return mapCarToRepresentation(car);
 	}
 
 	@PostMapping("/rent/{id}")
@@ -36,5 +45,15 @@ public class WebCarController {
 	@GetMapping("/config")
 	public CarConfigResponse getInfo() {
 		return new CarConfigResponse();
+	}
+
+	private CarRepresentationResponse mapCarToRepresentation(CarEntity car) {
+		return CarRepresentationResponse.builder()
+				.id(car.getId())
+				.carName(car.getName())
+				.isCarFree(carControllerUseCase.isCarFree(car.getId()))
+				.isCarRunning(carControllerUseCase.isCarRunning(car.getId()))
+				.leftRentedTime(carControllerUseCase.leftControlTime(car.getId()))
+				.build();
 	}
 }

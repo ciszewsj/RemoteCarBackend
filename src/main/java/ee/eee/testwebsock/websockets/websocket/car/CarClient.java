@@ -224,6 +224,10 @@ public class CarClient {
 		}
 	}
 
+	public long leftControlTime() {
+		return endTime - new Date().getTime();
+	}
+
 	public boolean isConnected() {
 		return socketSession != null && socketSession.isOpen();
 	}

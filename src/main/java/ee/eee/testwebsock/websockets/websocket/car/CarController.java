@@ -85,9 +85,19 @@ public class CarController implements CarControllerUseCase {
 	}
 
 	@Override
+	public boolean isCarFree(Long id) {
+		return false;
+	}
+
+	@Override
+	public long leftControlTime(Long id) {
+		return carClientMap.get(id).leftControlTime();
+	}
+
+	@Override
 	public void rentACar(Long carId, String userId) {
 		if (carClientMap.containsKey(carId)) {
-			carClientMap.get(carId);
+			carClientMap.get(carId).rentCar(userId);
 		}
 		throw new WebControllerException(WebControllerException.ExceptionStatus.CAR_NOT_FOUND);
 	}

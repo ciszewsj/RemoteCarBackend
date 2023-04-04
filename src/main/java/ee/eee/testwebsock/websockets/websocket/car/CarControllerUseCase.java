@@ -23,6 +23,10 @@ public interface CarControllerUseCase {
 
 	boolean isCarExists(Long id);
 
+	boolean isCarFree(Long id);
+
+	long leftControlTime(Long id);
+
 	void rentACar(Long carId, String userId);
 
 	void takeSteering(Long carId, String websocketId);
