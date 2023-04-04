@@ -28,7 +28,8 @@ public class CarStatusEntity {
 		CONNECTED,
 		DISCONNECTED,
 		CONNECTION_FAILURE,
-		CONFIGURE
-
+		CONFIGURE,
+		RENT,
+		END_RENT
 	}
 }

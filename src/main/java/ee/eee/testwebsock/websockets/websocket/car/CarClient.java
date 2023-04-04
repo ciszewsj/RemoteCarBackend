@@ -45,6 +45,11 @@ public class CarClient {
 	private final UserControllerUseCase userController;
 	private ScheduledFuture<?> controlFuture;
 
+	private String userId;
+	private String websocketId;
+	private Long endTime;
+
+	private static Long timeForRent = 3L * 60 * 1000;
 
 	public CarClient(Long id, String uri, Integer fps, UserControllerUseCase userController, CarImplService carImplService) {
 		this.id = id;
@@ -141,7 +146,6 @@ public class CarClient {
 
 	public void disconnect() {
 		try {
-
 			carImplService.turnCarOff(id);
 			carImplService.addCarStatus(id, CarStatusEntity.Status.DISCONNECTED);
 
@@ -169,10 +173,8 @@ public class CarClient {
 
 	private ScheduledFuture<?> controlFunction() {
 		ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
-		log.error("AM I HERE ?");
 		return executor.scheduleAtFixedRate(() -> {
 			try {
-				log.error("SEMDING");
 				if (new Date().getTime() > currentMessageTime + maxMessageDelay) {
 					carControlMessage.setData(new ControlMessage());
 				} else {
@@ -200,6 +202,26 @@ public class CarClient {
 			e.printStackTrace();
 		}
 		carImplService.addCarStatus(id, CarStatusEntity.Status.CONFIGURE);
+	}
+
+	public void rentCar(String userId) {
+		if (endTime < new Date().getTime()) {
+			websocketId = null;
+			this.userId = userId;
+			endTime = new Date().getTime() + timeForRent;
+		} else {
+			//TODO: CREATE NEW EXCEPTION FOR THIS
+			throw new IllegalStateException();
+		}
+	}
+
+	public void takeControlOverCar(String websocketId, String userId) {
+		if (userId.equals(this.userId) && endTime < new Date().getTime()) {
+			this.websocketId = websocketId;
+		} else {
+			//TODO: CREATE NEW EXCEPTION FOR THIS
+			throw new IllegalStateException();
+		}
 	}
 
 	public boolean isConnected() {

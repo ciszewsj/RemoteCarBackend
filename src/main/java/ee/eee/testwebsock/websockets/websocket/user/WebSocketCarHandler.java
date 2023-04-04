@@ -71,7 +71,7 @@ public class WebSocketCarHandler implements WebSocketHandler {
 		if (userControlMessage.getType().equals(UserControlMessage.UserControlMessageType.CONTROL_MESSAGE)) {
 			ControlMessage controlMessage = objectMapper.readValue(userControlMessage.getData().toString(), ControlMessage.class);
 			try {
-				carController.controlCar((long) session.getAttributes().get("carId"), controlMessage);
+				carController.controlCar((long) session.getAttributes().get("carId"), controlMessage, session.getId());
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

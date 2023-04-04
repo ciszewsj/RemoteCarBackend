@@ -15,11 +15,15 @@ public interface CarControllerUseCase {
 
 	void releaseCar(Long id);
 
-	void controlCar(Long id, ControlMessage controlMessage) throws IOException;
+	void controlCar(Long id, ControlMessage controlMessage, String carId) throws IOException;
 
 	void deleteCar(Long id);
 
 	boolean isCarRunning(Long id);
 
 	boolean isCarExists(Long id);
+
+	void rentACar(Long carId, String userId);
+
+	void takeSteering(Long carId, String websocketId);
 }

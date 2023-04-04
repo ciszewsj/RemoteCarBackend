@@ -49,7 +49,7 @@ public class CarController implements CarControllerUseCase {
 
 
 	@Override
-	public void controlCar(Long id, ControlMessage controlMessage) {
+	public void controlCar(Long id, ControlMessage controlMessage, String carId) {
 		CarClient car = getCarWSById(id);
 		if (car.isConnected()) {
 			car.controlCar(controlMessage);
@@ -82,6 +82,19 @@ public class CarController implements CarControllerUseCase {
 	@Override
 	public boolean isCarExists(Long id) {
 		return carClientMap.containsKey(id);
+	}
+
+	@Override
+	public void rentACar(Long carId, String userId) {
+		if (carClientMap.containsKey(carId)) {
+			carClientMap.get(carId);
+		}
+		throw new WebControllerException(WebControllerException.ExceptionStatus.CAR_NOT_FOUND);
+	}
+
+	@Override
+	public void takeSteering(Long carId, String websocketId) {
+
 	}
 
 }
