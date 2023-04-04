@@ -7,4 +7,6 @@ import lombok.Data;
 @Builder
 public class UserFrameMessage {
 	private byte[] frame;
+	private Long timeToEnd;
+	private String user;
 }

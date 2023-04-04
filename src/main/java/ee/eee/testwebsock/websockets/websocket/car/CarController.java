@@ -98,13 +98,15 @@ public class CarController implements CarControllerUseCase {
 	public void rentACar(Long carId, String userId) {
 		if (carClientMap.containsKey(carId)) {
 			carClientMap.get(carId).rentCar(userId);
+			return;
 		}
 		throw new WebControllerException(WebControllerException.ExceptionStatus.CAR_NOT_FOUND);
 	}
 
 	@Override
 	public void takeSteering(Long carId, String websocketId) {
-
+		if (carClientMap.containsKey(carId)) {
+		}
 	}
 
 }

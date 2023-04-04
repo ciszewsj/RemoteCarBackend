@@ -210,8 +210,7 @@ public class CarClient {
 			this.userId = userId;
 			endTime = new Date().getTime() + timeForRent;
 		} else {
-			//TODO: CREATE NEW EXCEPTION FOR THIS
-			throw new IllegalStateException();
+			throw new WebControllerException(WebControllerException.ExceptionStatus.CAR_IS_RENTED);
 		}
 	}
 
@@ -219,8 +218,7 @@ public class CarClient {
 		if (userId.equals(this.userId) && endTime < new Date().getTime()) {
 			this.websocketId = websocketId;
 		} else {
-			//TODO: CREATE NEW EXCEPTION FOR THIS
-			throw new IllegalStateException();
+			throw new WebControllerException(WebControllerException.ExceptionStatus.COULD_NOT_TAKE_CONTROL);
 		}
 	}
 

@@ -25,6 +25,8 @@ public class WebControllerException extends RuntimeException implements Supplier
 		CAR_IS_RUNNING(HttpStatus.CONFLICT, "E002"),
 		CAR_IS_NOT_RUNNING(HttpStatus.CONFLICT, "E003"),
 		COULD_NOT_CONFIGURE_CAR_WHILE_RUNNING(HttpStatus.CONFLICT, "E004"),
+		CAR_IS_RENTED(HttpStatus.CONFLICT, "E005"),
+		COULD_NOT_TAKE_CONTROL(HttpStatus.CONFLICT, "E006"),
 
 		CAR_START_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "E010"),
 		CAR_STOP_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "E011"),
