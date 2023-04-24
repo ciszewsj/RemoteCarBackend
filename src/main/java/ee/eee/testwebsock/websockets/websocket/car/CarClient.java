@@ -85,6 +85,7 @@ public class CarClient {
 									)
 							)
 					);
+					log.info("!@3xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
 				} catch (IOException e) {
 					log.error("Could not send config message", e);
 				}
@@ -172,8 +173,10 @@ public class CarClient {
 	}
 
 	private ScheduledFuture<?> controlFunction() {
+		log.info("123");
 		ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 		return executor.scheduleAtFixedRate(() -> {
+			log.info("oooo");
 			try {
 				if (new Date().getTime() > currentMessageTime + maxMessageDelay) {
 					carControlMessage.setData(new ControlMessage());

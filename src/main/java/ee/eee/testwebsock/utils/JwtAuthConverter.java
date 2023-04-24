@@ -1,5 +1,6 @@
-package ee.eee.testwebsock.config.security;
+package ee.eee.testwebsock.utils;
 
+import ee.eee.testwebsock.properties.JwtAuthConverterProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
@@ -52,8 +53,7 @@ public class JwtAuthConverter implements Converter<Jwt, AbstractAuthenticationTo
 		Collection<String> resourceRoles;
 		log.error("IAM HERE");
 		log.error("COS FAJNEGO XDF {}", resourceAccess.get(properties.getResourceId()));
-		if (resourceAccess == null
-				|| (resource = (Map<String, Object>) resourceAccess.get(properties.getResourceId())) == null
+		if ((resource = (Map<String, Object>) resourceAccess.get(properties.getResourceId())) == null
 				|| (resourceRoles = (Collection<String>) resource.get("roles")) == null) {
 			return Set.of();
 		}

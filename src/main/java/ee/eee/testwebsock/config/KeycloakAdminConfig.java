@@ -1,4 +1,4 @@
-package ee.eee.testwebsock.config.security;
+package ee.eee.testwebsock.config;
 
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.KeycloakBuilder;
@@ -7,7 +7,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class KeycloakAdmin {
+
+public class KeycloakAdminConfig {
 	@Bean
 	public Keycloak keycloak() {
 		return KeycloakBuilder.builder()

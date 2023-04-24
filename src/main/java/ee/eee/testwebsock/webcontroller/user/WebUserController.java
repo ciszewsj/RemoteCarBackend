@@ -9,6 +9,7 @@ import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,7 +26,8 @@ public class WebUserController {
 	private final RealmResource realm;
 
 	@PostMapping
-	public void register(@RequestBody RegisterUserRequest request) {
+	public void register(@Validated @RequestBody RegisterUserRequest request) {
+
 		UserRepresentation userRepresentation = new UserRepresentation();
 
 		userRepresentation.setUsername(request.getName());
