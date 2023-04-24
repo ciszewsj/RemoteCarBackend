@@ -9,6 +9,7 @@ import ee.eee.testwebsock.webcontroller.adminconfig.requests.AddCarRequest;
 import ee.eee.testwebsock.websockets.websocket.car.CarControllerUseCase;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -35,12 +36,13 @@ public class WebAdminCarController {
 	}
 
 	@PostMapping
-	public Long addCar(@RequestBody AddCarRequest addCarRequest) {
+	public Long addCar(@Validated @RequestBody AddCarRequest addCarRequest) {
 		CarEntity car = new CarEntity();
 		car.setName(addCarRequest.getName());
 		car.setUrl(addCarRequest.getUrl());
 		car.setFps(addCarRequest.getFps());
 		car = carRepository.save(car);
+		car.setPictureUrl(addCarRequest.getPictureUrl());
 
 		carController.addNewCar(car);
 		carImplService.addCarStatus(car.getId(), CarStatusEntity.Status.CREATED);
@@ -48,14 +50,15 @@ public class WebAdminCarController {
 	}
 
 	@PutMapping("/{id}")
-	public Long updateCar(@PathVariable Long id, @RequestBody AddCarRequest addCarRequest) {
+	public Long updateCar(@PathVariable Long id, @Validated @RequestBody AddCarRequest addCarRequest) {
 		CarEntity car = carRepository.findById(id)
 				.orElseThrow(new WebControllerException(WebControllerException.ExceptionStatus.CAR_NOT_FOUND));
 		car.setName(addCarRequest.getName());
 		car.setUrl(addCarRequest.getUrl());
 		car.setFps(addCarRequest.getFps());
-		car = carRepository.save(car);
+		car.setPictureUrl(addCarRequest.getPictureUrl());
 
+		car = carRepository.save(car);
 		carController.configCar(car);
 		return car.getId();
 	}
