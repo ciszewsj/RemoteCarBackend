@@ -7,4 +7,7 @@ import lombok.Data;
 @Builder
 public class UserFrameMessage {
 	private byte[] frame;
+	private Long controlLastTime;
+	private String userName;
+	private String websocketId;
 }
