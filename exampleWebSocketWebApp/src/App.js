@@ -10,7 +10,7 @@ function App() {
     let [image, setImage] = useState("");
 
     useEffect(() => {
-        let url = 'ws://localhost:8080/cars/1'
+        let url = 'ws://localhost:8081/cars/1'
         console.log("Execute?")
         let websocket = new WebSocket(url)
         websocket.onopen = () => {
@@ -45,7 +45,7 @@ function App() {
     return (
         <div className="App">
             <header className="App-header">
-                <img src={`data:image/jpeg;base64,${image}`} style={{height: "80px", width: "80px"}} alt="logo"/>
+                <img src={`data:image/jpeg;base64,${image}`} style={{height: "720px", width: "1280px"}} alt="logo"/>
                 <button onClick={() => {
                     try {
 

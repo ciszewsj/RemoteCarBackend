@@ -18,6 +18,7 @@ import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Base64;
 import java.util.Date;
 import java.util.concurrent.*;
 
@@ -74,6 +75,9 @@ public class CarClient {
 			@Override
 			public void afterConnectionEstablished(WebSocketSession session) {
 				socketSession = session;
+
+				socketSession.setTextMessageSizeLimit(10 * 1024 * 1024);
+
 				CarConfigMessage configMessage = CarConfigMessage.builder().fps(fps).build();
 				try {
 					session.sendMessage(
@@ -85,22 +89,20 @@ public class CarClient {
 									)
 							)
 					);
-					log.info("!@3xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
 				} catch (IOException e) {
 					log.error("Could not send config message", e);
 				}
-				log.error("XD?");
 				controlFuture = controlFunction();
 			}
 
 			@Override
 			public void handleMessage(WebSocketSession session, WebSocketMessage<?> message) {
-				log.debug("Received message : {}", message.getPayload());
+//				log.info("Received message : {}", message.getPayload());
 				try {
 					CarControlMessage<?> carControlMessage = objectMapper.readValue(message.getPayload().toString(), CarControlMessage.class);
 					if (carControlMessage.getType().equals(CarControlMessage.CarControlMessageType.DISPLAY_MESSAGE)) {
 						CarFrameMessage frameMessage = objectMapper.convertValue(carControlMessage.getData(), CarFrameMessage.class);
-						userController.sendFrameToUsers(id, frameMessage.getImage());
+						userController.sendFrameToUsers(id, Base64.getDecoder().decode(frameMessage.getImage()));
 					} else if (carControlMessage.getType().equals(CarControlMessage.CarControlMessageType.INFO_MESSAGE)) {
 						log.info("Received info from car");
 					}
@@ -173,10 +175,8 @@ public class CarClient {
 	}
 
 	private ScheduledFuture<?> controlFunction() {
-		log.info("123");
 		ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 		return executor.scheduleAtFixedRate(() -> {
-			log.info("oooo");
 			try {
 				if (new Date().getTime() > currentMessageTime + maxMessageDelay) {
 					carControlMessage.setData(new ControlMessage());
