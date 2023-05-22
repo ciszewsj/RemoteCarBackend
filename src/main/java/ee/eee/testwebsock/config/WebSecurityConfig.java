@@ -1,6 +1,6 @@
 package ee.eee.testwebsock.config;
 
-import ee.eee.testwebsock.utils.JwtAuthConverter;
+import ee.eee.testwebsock.utils.MyPrincipalJwtConvertor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,7 +15,7 @@ import org.springframework.security.web.SecurityFilterChain;
 public class WebSecurityConfig {
 	public static final String ADMIN = "admin";
 	public static final String USER = "user";
-	private final JwtAuthConverter jwtAuthConverter;
+	private final MyPrincipalJwtConvertor jwtAuthConverter;
 
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {

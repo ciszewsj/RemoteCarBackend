@@ -1,7 +1,6 @@
 package ee.eee.testwebsock.websockets.websocket.user;
 
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ee.eee.testwebsock.websockets.data.ControlMessage;
 import ee.eee.testwebsock.websockets.data.user.UserControlMessage;
@@ -62,7 +61,6 @@ public class WebSocketCarHandler implements WebSocketHandler {
 				e.printStackTrace();
 			}
 		}
-
 	}
 
 	@Override
@@ -75,9 +73,6 @@ public class WebSocketCarHandler implements WebSocketHandler {
 				log.info("SPEED : {} - {}", controlMessage.getHorizontalSpeed(), controlMessage.getVerticalSpeed());
 				log.info(session.getId());
 				carController.controlCar((long) session.getAttributes().get("carId"), controlMessage, session.getId());
-			} else if (userControlMessage.getType().equals(UserControlMessage.UserControlMessageType.GET_CONTROL)) {
-				log.info("Get Control");
-				carController.takeSteering((long) session.getAttributes().get("carId"), session.getId(), "");
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

@@ -63,19 +63,23 @@ public class UserController implements UserControllerUseCase {
 						e.printStackTrace();
 						return;
 					}
+					try {
+						clients.forEach(client -> {
+							try {
 
-					clients.forEach(client -> {
-						try {
-							if ((long) client.getAttributes().get("carId") == carId) {
-								if ((client.getAttributes().get("resolution") == null && size == defaultImageSize)
-										|| size.toString().equals(client.getAttributes().get("resolution"))) {
-									client.sendMessage(message);
+								if ((long) client.getAttributes().get("carId") == carId) {
+									if ((client.getAttributes().get("resolution") == null && size == defaultImageSize)
+											|| size.toString().equals(client.getAttributes().get("resolution"))) {
+										client.sendMessage(message);
+									}
 								}
+							} catch (IOException e) {
+								e.printStackTrace();
 							}
-						} catch (IOException e) {
-							e.printStackTrace();
-						}
-					});
+						});
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
 				});
 	}
 }

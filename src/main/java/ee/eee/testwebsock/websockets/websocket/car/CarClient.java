@@ -158,7 +158,10 @@ public class CarClient {
 		}
 	}
 
-	public void controlCar(ControlMessage controlMessage) {
+	public void controlCar(ControlMessage controlMessage, String websocketId) {
+		if (!websocketId.equals(this.websocketId)) {
+			throw new WebControllerException(WebControllerException.ExceptionStatus.CAR_IS_NOT_STEERING_BY_YOU);
+		}
 		currentControlMessage = controlMessage;
 		currentMessageTime = new Date().getTime();
 	}

@@ -1,14 +1,17 @@
 package ee.eee.testwebsock.webcontroller.cars;
 
+import ee.eee.testwebsock.utils.CustomAuthenticationObject;
 import ee.eee.testwebsock.database.CarEntityRepository;
 import ee.eee.testwebsock.database.CarImplService;
 import ee.eee.testwebsock.database.data.CarEntity;
 import ee.eee.testwebsock.database.data.CarStatusEntity;
+import ee.eee.testwebsock.webcontroller.cars.requests.CarRentRequest;
 import ee.eee.testwebsock.webcontroller.cars.responses.CarConfigResponse;
 import ee.eee.testwebsock.webcontroller.cars.responses.CarRepresentationResponse;
 import ee.eee.testwebsock.websockets.websocket.car.CarControllerUseCase;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -37,9 +40,17 @@ public class WebCarController {
 	}
 
 	@PostMapping("/rent/{id}")
-	public void rentCar(@PathVariable Long id) {
-		carControllerUseCase.rentACar(id, null);
+	public void rentCar(@PathVariable Long id,
+	                    @AuthenticationPrincipal CustomAuthenticationObject user) {
+		carControllerUseCase.rentACar(id, user.getId());
 		carImplService.addCarStatus(id, CarStatusEntity.Status.RENT);
+	}
+
+	@PostMapping("/take_control/{id}")
+	public void takeControl(@PathVariable Long id,
+	                        @RequestBody CarRentRequest request,
+	                        @AuthenticationPrincipal CustomAuthenticationObject user) {
+		carControllerUseCase.takeSteering(id, request.getWebsocketId(), user.getId());
 	}
 
 	@GetMapping("/config")

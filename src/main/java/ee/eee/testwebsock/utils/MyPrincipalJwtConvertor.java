@@ -1,6 +1,7 @@
 package ee.eee.testwebsock.utils;
 
 import ee.eee.testwebsock.properties.JwtAuthConverterProperties;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
@@ -20,23 +21,24 @@ import java.util.stream.Stream;
 
 @Slf4j
 @Component
-public class JwtAuthConverter implements Converter<Jwt, AbstractAuthenticationToken> {
+@RequiredArgsConstructor
+public class MyPrincipalJwtConvertor implements Converter<Jwt, AbstractAuthenticationToken> {
 
 	private final JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
-
 	private final JwtAuthConverterProperties properties;
 
-	public JwtAuthConverter(JwtAuthConverterProperties properties) {
-		this.properties = properties;
-	}
 
 	@Override
 	public AbstractAuthenticationToken convert(Jwt jwt) {
+
 		Collection<GrantedAuthority> authorities = Stream.concat(
 				jwtGrantedAuthoritiesConverter.convert(jwt).stream(),
 				extractResourceRoles(jwt).stream()).collect(Collectors.toSet());
-		return new JwtAuthenticationToken(jwt, authorities, getPrincipalClaimName(jwt));
+
+		CustomAuthenticationObject customAuthenticationObject = new CustomAuthenticationObject(jwt.getTokenValue(), jwt.getIssuedAt(), jwt.getExpiresAt(), jwt.getHeaders(), jwt.getClaims());
+		return new JwtAuthenticationToken(customAuthenticationObject, authorities, getPrincipalClaimName(jwt));
 	}
+
 
 	private String getPrincipalClaimName(Jwt jwt) {
 		String claimName = JwtClaimNames.SUB;
@@ -56,7 +58,8 @@ public class JwtAuthConverter implements Converter<Jwt, AbstractAuthenticationTo
 		}
 		return resourceRoles.stream()
 				.map(role -> new SimpleGrantedAuthority("ROLE_" + role))
-//				.peek(role -> log.error("ROLE {}", role))
 				.collect(Collectors.toSet());
 	}
 }
+
+

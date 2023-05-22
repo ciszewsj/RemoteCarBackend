@@ -49,10 +49,10 @@ public class CarController implements CarControllerUseCase {
 
 
 	@Override
-	public void controlCar(Long id, ControlMessage controlMessage, String carId) {
+	public void controlCar(Long id, ControlMessage controlMessage, String websocketId) {
 		CarClient car = getCarWSById(id);
 		if (car.isConnected()) {
-			car.controlCar(controlMessage);
+			car.controlCar(controlMessage, websocketId);
 			return;
 		}
 		throw new WebControllerException(WebControllerException.ExceptionStatus.CAR_IS_NOT_RUNNING);
@@ -107,7 +107,11 @@ public class CarController implements CarControllerUseCase {
 	@Override
 	public void takeSteering(Long carId, String websocketId, String userId) {
 		if (carClientMap.containsKey(carId)) {
+			carClientMap.get(carId).takeControlOverCar(websocketId, userId);
+			return;
 		}
+		throw new WebControllerException(WebControllerException.ExceptionStatus.CAR_NOT_FOUND);
+
 	}
 
 }

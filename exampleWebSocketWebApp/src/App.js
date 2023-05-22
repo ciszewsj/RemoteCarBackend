@@ -20,8 +20,11 @@ function App() {
     useEffect(() => {
         let url = 'ws://localhost:8081/cars/1'
         console.log("Execute?")
+        let headers = JSON.stringify({
+            token: 'My-little-token'
+        })
         let websocket = new WebSocket(url)
-        websocket.onopen = () => {
+        websocket.onopen = (wsm, req) => {
             console.log("Connected")
             // websocket.send("COnnnected")
         };
