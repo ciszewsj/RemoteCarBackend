@@ -12,7 +12,4 @@ public class AddCarRequest {
 	@NotEmpty
 	@Size(min = 1, max = 256)
 	private final String url;
-	@Size(max = 256)
-	private final String pictureUrl;
-	private final Integer fps;
 }

@@ -21,8 +21,6 @@ public class CarEntity {
 
 	private String url;
 
-	private String pictureUrl;
-
 	private Integer fps;
 
 	private ConnectionStatus status = CarEntity.ConnectionStatus.DISCONNECTED;

@@ -40,9 +40,7 @@ public class WebAdminCarController {
 		CarEntity car = new CarEntity();
 		car.setName(addCarRequest.getName());
 		car.setUrl(addCarRequest.getUrl());
-		car.setFps(addCarRequest.getFps());
 		car = carRepository.save(car);
-		car.setPictureUrl(addCarRequest.getPictureUrl());
 
 		carController.addNewCar(car);
 		carImplService.addCarStatus(car.getId(), CarStatusEntity.Status.CREATED);
@@ -55,8 +53,6 @@ public class WebAdminCarController {
 				.orElseThrow(new WebControllerException(WebControllerException.ExceptionStatus.CAR_NOT_FOUND));
 		car.setName(addCarRequest.getName());
 		car.setUrl(addCarRequest.getUrl());
-		car.setFps(addCarRequest.getFps());
-		car.setPictureUrl(addCarRequest.getPictureUrl());
 
 		car = carRepository.save(car);
 		carController.configCar(car);

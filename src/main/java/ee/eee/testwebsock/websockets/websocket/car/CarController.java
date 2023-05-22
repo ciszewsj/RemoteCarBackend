@@ -23,7 +23,7 @@ public class CarController implements CarControllerUseCase {
 
 	@Override
 	public void addNewCar(CarEntity car) {
-		CarClient carClient = new CarClient(car.getId(), car.getUrl(), car.getFps(), userControllerUseCase, carImplService);
+		CarClient carClient = new CarClient(car.getId(), car.getUrl(), userControllerUseCase, carImplService);
 		carClientMap.put(car.getId(), carClient);
 	}
 
@@ -44,7 +44,7 @@ public class CarController implements CarControllerUseCase {
 
 	@Override
 	public void configCar(CarEntity car) {
-		getCarWSById(car.getId()).configure(car.getUrl(), car.getFps());
+		getCarWSById(car.getId()).configure(car.getUrl());
 	}
 
 
@@ -53,6 +53,7 @@ public class CarController implements CarControllerUseCase {
 		CarClient car = getCarWSById(id);
 		if (car.isConnected()) {
 			car.controlCar(controlMessage);
+			return;
 		}
 		throw new WebControllerException(WebControllerException.ExceptionStatus.CAR_IS_NOT_RUNNING);
 	}

@@ -66,18 +66,21 @@ public class WebSocketCarHandler implements WebSocketHandler {
 	}
 
 	@Override
-	public void handleMessage(WebSocketSession session, WebSocketMessage<?> message) throws JsonProcessingException {
-		UserControlMessage<?> userControlMessage = objectMapper.readValue(message.getPayload().toString(), UserControlMessage.class);
-		if (userControlMessage.getType().equals(UserControlMessage.UserControlMessageType.CONTROL_MESSAGE)) {
-			ControlMessage controlMessage = objectMapper.readValue(userControlMessage.getData().toString(), ControlMessage.class);
-			try {
+	public void handleMessage(WebSocketSession session, WebSocketMessage<?> message) {
+		try {
+
+			UserControlMessage<?> userControlMessage = objectMapper.readValue(message.getPayload().toString(), UserControlMessage.class);
+			if (userControlMessage.getType().equals(UserControlMessage.UserControlMessageType.CONTROL_MESSAGE)) {
+				ControlMessage controlMessage = objectMapper.convertValue(userControlMessage.getData(), ControlMessage.class);
+				log.info("SPEED : {} - {}", controlMessage.getHorizontalSpeed(), controlMessage.getVerticalSpeed());
+				log.info(session.getId());
 				carController.controlCar((long) session.getAttributes().get("carId"), controlMessage, session.getId());
-			} catch (IOException e) {
-				e.printStackTrace();
+			} else if (userControlMessage.getType().equals(UserControlMessage.UserControlMessageType.GET_CONTROL)) {
+				log.info("Get Control");
+				carController.takeSteering((long) session.getAttributes().get("carId"), session.getId(), "");
 			}
-		} else if (userControlMessage.getType().equals(UserControlMessage.UserControlMessageType.GET_CONTROL)) {
-			log.info("Get Control");
-			carController.takeSteering((long) session.getAttributes().get("carId"), session.getId(), "");
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 

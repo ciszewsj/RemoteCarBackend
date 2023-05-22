@@ -9,6 +9,14 @@ function App() {
 
     let [image, setImage] = useState("");
 
+    let sendMessage = () => {
+        if (ws) {
+            let a = JSON.stringify({type: "CONTROL_MESSAGE", data: {verticalSpeed: 1.0, horizontalSpeed: 1.0}})
+            console.log(a)
+            ws.send(a)
+        }
+    }
+
     useEffect(() => {
         let url = 'ws://localhost:8081/cars/1'
         console.log("Execute?")
@@ -46,29 +54,11 @@ function App() {
         <div className="App">
             <header className="App-header">
                 <img src={`data:image/jpeg;base64,${image}`} style={{height: "720px", width: "1280px"}} alt="logo"/>
-                <button onClick={() => {
-                    try {
-
-                        ws.send(JSON.stringify({type: "CONTROL_MESSAGE", data: {}}))
-                        console.log("Send message")
-                    } catch (e) {
-                        console.log("NOT READY")
-                    }
-                }}>Button to send !
+                <button onClick={sendMessage}>Button to send !
                 </button>
                 <p>
-                    Edit <code>src/App.js</code> and save to reload.
-                </p>
-                <a
-                    className="App-link"
-                    href="https://reactjs.org"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    Learn React
-                </a>
-                <p>
-                    {lastMessage}
+                    {ws.open && <h2>DZIALA</h2>}
+                    {!ws.open && <h2>NIE DZIALA</h2>}
                 </p>
             </header>
         </div>

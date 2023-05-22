@@ -26,7 +26,6 @@ import java.util.concurrent.*;
 public class CarClient {
 	private URI uri;
 	private final Long id;
-	private Integer fps;
 
 
 	private final int tickRate = 20;
@@ -50,9 +49,9 @@ public class CarClient {
 	private String websocketId;
 	private Long endTime;
 
-	private static Long timeForRent = 3L * 60 * 1000;
+	private static final Long timeForRent = 3L * 60 * 1000;
 
-	public CarClient(Long id, String uri, Integer fps, UserControllerUseCase userController, CarImplService carImplService) {
+	public CarClient(Long id, String uri, UserControllerUseCase userController, CarImplService carImplService) {
 		this.id = id;
 		try {
 			this.uri = new URI(uri);
@@ -61,7 +60,6 @@ public class CarClient {
 		}
 		this.userController = userController;
 		this.client = new StandardWebSocketClient();
-		this.fps = fps;
 
 		this.webSocketHandler = webSocketHandler();
 
@@ -78,7 +76,7 @@ public class CarClient {
 
 				socketSession.setTextMessageSizeLimit(10 * 1024 * 1024);
 
-				CarConfigMessage configMessage = CarConfigMessage.builder().fps(fps).build();
+				CarConfigMessage configMessage = CarConfigMessage.builder().build();
 				try {
 					session.sendMessage(
 							new TextMessage(
@@ -193,14 +191,13 @@ public class CarClient {
 		}, 0, 1000 / tickRate, TimeUnit.MILLISECONDS);
 	}
 
-	public void configure(String uri, Integer fps) {
+	public void configure(String uri) {
 		if (isConnected()) {
 			throw new WebControllerException(WebControllerException.ExceptionStatus.COULD_NOT_CONFIGURE_CAR_WHILE_RUNNING);
 		}
 		this.uri = null;
 		try {
 			this.uri = new URI(uri);
-			this.fps = fps;
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
 		}
@@ -230,6 +227,8 @@ public class CarClient {
 	}
 
 	public boolean isConnected() {
+		log.info("socket session {}", socketSession);
+
 		return socketSession != null && socketSession.isOpen();
 	}
 }
