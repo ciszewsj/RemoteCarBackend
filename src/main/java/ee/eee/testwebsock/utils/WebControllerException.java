@@ -33,6 +33,8 @@ public class WebControllerException extends RuntimeException implements Supplier
 		CAR_STOP_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "E011"),
 		CAR_NOT_FOUND_IN_CONTROLLER(HttpStatus.INTERNAL_SERVER_ERROR, "E012"),
 
+		COULD_NOT_FIND_FILE(HttpStatus.NOT_FOUND, "E97"),
+		COULD_NOT_SAVE_FILE(HttpStatus.CONFLICT, "E98"),
 		COULD_NOT_REGISTER_USER(HttpStatus.CONFLICT, "E99");
 		@Getter
 		private final HttpStatus httpStatus;

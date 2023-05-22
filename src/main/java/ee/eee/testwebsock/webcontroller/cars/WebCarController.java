@@ -5,18 +5,26 @@ import ee.eee.testwebsock.database.CarEntityRepository;
 import ee.eee.testwebsock.database.CarImplService;
 import ee.eee.testwebsock.database.data.CarEntity;
 import ee.eee.testwebsock.database.data.CarStatusEntity;
+import ee.eee.testwebsock.utils.WebControllerException;
 import ee.eee.testwebsock.webcontroller.cars.requests.CarRentRequest;
 import ee.eee.testwebsock.webcontroller.cars.responses.CarConfigResponse;
 import ee.eee.testwebsock.webcontroller.cars.responses.CarRepresentationResponse;
 import ee.eee.testwebsock.websockets.websocket.car.CarControllerUseCase;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.MalformedURLException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static ee.eee.testwebsock.utils.WebControllerException.ExceptionStatus.COULD_NOT_FIND_FILE;
 
 @Slf4j
 @RestController
@@ -71,5 +79,21 @@ public class WebCarController {
 				.isCarRunning(carControllerUseCase.isCarRunning(car.getId()))
 				.leftRentedTime(carControllerUseCase.leftControlTime(car.getId()))
 				.build();
+	}
+
+	@GetMapping("/image/{id}")
+	public Resource getImage(@PathVariable Long id) {
+		try {
+			Path path = Paths.get("ścieżka/do/zapisu/" + id);
+			Resource resource = new UrlResource(path.toUri());
+			if (resource.exists()) {
+				return resource;
+			} else {
+				throw new WebControllerException(COULD_NOT_FIND_FILE);
+			}
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+			throw new WebControllerException(COULD_NOT_FIND_FILE);
+		}
 	}
 }

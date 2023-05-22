@@ -9,10 +9,21 @@ import ee.eee.testwebsock.webcontroller.adminconfig.requests.AddCarRequest;
 import ee.eee.testwebsock.websockets.websocket.car.CarControllerUseCase;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
+
+import static ee.eee.testwebsock.utils.WebControllerException.ExceptionStatus.COULD_NOT_FIND_FILE;
+import static ee.eee.testwebsock.utils.WebControllerException.ExceptionStatus.COULD_NOT_SAVE_FILE;
 
 @Slf4j
 @RestController
@@ -86,5 +97,50 @@ public class WebAdminCarController {
 			throw new WebControllerException(WebControllerException.ExceptionStatus.CAR_IS_NOT_RUNNING);
 		}
 		carController.releaseCar(id);
+	}
+
+	@PostMapping("/image/{id}")
+	public void addImage(@PathVariable Long id,
+	                     @RequestParam("photo") MultipartFile file) {
+		try {
+			byte[] bytes = file.getBytes();
+			Path path = Paths.get("ścieżka/do/zapisu/" + id);
+			Files.write(path, bytes);
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new WebControllerException(COULD_NOT_SAVE_FILE);
+		}
+
+	}
+
+	@GetMapping("/image/{id}")
+	public Resource getImage(@PathVariable Long id) {
+		try {
+			Path path = Paths.get("ścieżka/do/zapisu/" + id);
+			Resource resource = new UrlResource(path.toUri());
+			if (resource.exists()) {
+				return resource;
+			} else {
+				throw new WebControllerException(COULD_NOT_FIND_FILE);
+			}
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+			throw new WebControllerException(COULD_NOT_FIND_FILE);
+		}
+	}
+
+	@DeleteMapping("/image/{id}")
+	public void deleteImage(@PathVariable Long id) {
+		try {
+			Path path = Paths.get("ścieżka/do/zapisu/" + id);
+			if (Files.exists(path)) {
+				Files.delete(path);
+			} else {
+				throw new WebControllerException(COULD_NOT_FIND_FILE);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new WebControllerException(COULD_NOT_FIND_FILE);
+		}
 	}
 }
