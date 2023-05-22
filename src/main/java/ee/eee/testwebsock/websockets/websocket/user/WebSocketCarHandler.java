@@ -32,6 +32,7 @@ public class WebSocketCarHandler implements WebSocketHandler {
 					UserControlMessage.UserControlMessageType.INFO_MESSAGE,
 					UserInfoMessage.builder()
 							.msg(UserInfoMessage.UserInfoType.CAR_NOT_EXISTS)
+							.websocketId(session.getId())
 							.build()
 			);
 			try {
@@ -52,6 +53,7 @@ public class WebSocketCarHandler implements WebSocketHandler {
 					UserControlMessage.UserControlMessageType.INFO_MESSAGE,
 					UserInfoMessage.builder()
 							.msg(UserInfoMessage.UserInfoType.CONNECTED_SUCCESSFULLY)
+							.websocketId(session.getId())
 							.build()
 			);
 			try {

@@ -208,7 +208,7 @@ public class CarClient {
 	}
 
 	public void rentCar(String userId) {
-		if (endTime < new Date().getTime()) {
+		if (endTime == null || endTime < new Date().getTime()) {
 			websocketId = null;
 			this.userId = userId;
 			endTime = new Date().getTime() + timeForRent;
@@ -218,7 +218,11 @@ public class CarClient {
 	}
 
 	public void takeControlOverCar(String websocketId, String userId) {
-		if (userId.equals(this.userId) && endTime < new Date().getTime()) {
+		log.info("???? {} {}", websocketId, userId);
+		log.info("{} == {} ? {}", userId, this.userId, userId.equals(this.userId));
+		log.info("{} > {} ? {}", endTime, new Date().getTime(), endTime < new Date().getTime());
+		if (userId.equals(this.userId) && endTime > new Date().getTime()) {
+			log.info("CONTROL CHANGED");
 			this.websocketId = websocketId;
 		} else {
 			throw new WebControllerException(WebControllerException.ExceptionStatus.COULD_NOT_TAKE_CONTROL);

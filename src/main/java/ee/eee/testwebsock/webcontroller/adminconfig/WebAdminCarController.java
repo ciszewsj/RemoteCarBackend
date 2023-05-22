@@ -16,6 +16,7 @@ import java.util.List;
 
 @Slf4j
 @RestController
+@CrossOrigin
 @RequestMapping("/car_admin")
 @RequiredArgsConstructor
 public class WebAdminCarController {

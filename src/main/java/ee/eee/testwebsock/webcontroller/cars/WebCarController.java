@@ -12,6 +12,7 @@ import ee.eee.testwebsock.websockets.websocket.car.CarControllerUseCase;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,6 +21,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @RestController
 @RequestMapping("/car")
+@CrossOrigin
 @RequiredArgsConstructor
 public class WebCarController {
 
@@ -42,14 +44,17 @@ public class WebCarController {
 	@PostMapping("/rent/{id}")
 	public void rentCar(@PathVariable Long id,
 	                    @AuthenticationPrincipal CustomAuthenticationObject user) {
+		log.info("carId {} try rented by {}", id, user.getId());
 		carControllerUseCase.rentACar(id, user.getId());
 		carImplService.addCarStatus(id, CarStatusEntity.Status.RENT);
 	}
 
 	@PostMapping("/take_control/{id}")
 	public void takeControl(@PathVariable Long id,
-	                        @RequestBody CarRentRequest request,
+	                        @Validated @RequestBody CarRentRequest request,
 	                        @AuthenticationPrincipal CustomAuthenticationObject user) {
+		log.info("carId {} try steering by {} with webSockId {}", id, user.getId(), request.getWebsocketId());
+
 		carControllerUseCase.takeSteering(id, request.getWebsocketId(), user.getId());
 	}
 

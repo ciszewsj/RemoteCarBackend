@@ -8,6 +8,8 @@ import lombok.Data;
 public class UserInfoMessage {
 	private UserInfoType msg;
 
+	private String websocketId;
+
 	public enum UserInfoType {
 		CONNECTED_SUCCESSFULLY,
 		CAR_NOT_EXISTS,
