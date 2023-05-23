@@ -23,7 +23,6 @@ import static ee.eee.testwebsock.utils.ImageObject.defaultImageSize;
 public class UserController implements UserControllerUseCase {
 	private static final Set<WebSocketSession> clients = Collections.synchronizedSet(new HashSet<>());
 
-	private final ImageResizer imageResizer;
 	ObjectMapper objectMapper = new ObjectMapper();
 
 
@@ -39,47 +38,51 @@ public class UserController implements UserControllerUseCase {
 
 	@Override
 	public void sendFrameToUsers(Long carId, String userRentId, String sessionId, Long leftTime, byte[] frame) {
+		try {
+			ImageObject imageObject = new ImageObject(frame);
 
-		ImageObject imageObject = new ImageObject(frame, imageResizer);
 
-		Arrays.stream(ImageObject.imageSizes)
-				.forEach(size -> {
-					TextMessage message;
-					try {
-						message = new TextMessage(
-								objectMapper.writeValueAsString(
-										new UserControlMessage<>(
-												UserControlMessage.UserControlMessageType.DISPLAY_MESSAGE,
-												UserFrameMessage.builder()
-														.frame(imageObject.getImageBySize(size))
-														.userRentId(userRentId)
-														.timeToEnd(leftTime)
-														.sessionSteeringId(sessionId)
-														.build()
-										)
-								)
-						);
-					} catch (JsonProcessingException e) {
-						e.printStackTrace();
-						return;
-					}
-					try {
-						clients.forEach(client -> {
-							try {
+			Arrays.stream(ImageObject.imageSizes)
+					.forEach(size -> {
+						TextMessage message;
+						try {
+							message = new TextMessage(
+									objectMapper.writeValueAsString(
+											new UserControlMessage<>(
+													UserControlMessage.UserControlMessageType.DISPLAY_MESSAGE,
+													UserFrameMessage.builder()
+															.frame(imageObject.getImageBySize(size))
+															.userRentId(userRentId)
+															.timeToEnd(leftTime)
+															.sessionSteeringId(sessionId)
+															.build()
+											)
+									)
+							);
+						} catch (JsonProcessingException e) {
+							e.printStackTrace();
+							return;
+						}
+						try {
+							clients.forEach(client -> {
+								try {
 
-								if ((long) client.getAttributes().get("carId") == carId) {
-									if ((client.getAttributes().get("resolution") == null && size == defaultImageSize)
-											|| size.toString().equals(client.getAttributes().get("resolution"))) {
-										client.sendMessage(message);
+									if ((long) client.getAttributes().get("carId") == carId) {
+										if ((client.getAttributes().get("resolution") == null && size == defaultImageSize)
+												|| size.toString().equals(client.getAttributes().get("resolution"))) {
+											client.sendMessage(message);
+										}
 									}
+								} catch (IOException e) {
+									e.printStackTrace();
 								}
-							} catch (IOException e) {
-								e.printStackTrace();
-							}
-						});
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				});
+							});
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					});
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }

@@ -2,9 +2,13 @@ package ee.eee.testwebsock.utils;
 
 import lombok.Data;
 
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+
+import static ee.eee.testwebsock.utils.ImageResizer.byteArrayToBufferedImage;
 
 @Data
 public class ImageObject {
@@ -14,12 +18,12 @@ public class ImageObject {
 	private Map<ImageSize, byte[]> imageSizeMap;
 
 
-	public ImageObject(byte[] image, ImageResizer resizer) {
+	public ImageObject(byte[] image) throws IOException {
 		imageSizeMap = new HashMap<>();
-
+		BufferedImage bufferedImage = byteArrayToBufferedImage(image);
 		Arrays.stream(imageSizes).forEach(size -> {
 			try {
-				imageSizeMap.put(size, resizer.resizeImage(image, size));
+				imageSizeMap.put(size, ImageResizer.resizeImage(bufferedImage, size));
 			} catch (Exception e) {
 				e.printStackTrace();
 				imageSizeMap.put(size, null);
