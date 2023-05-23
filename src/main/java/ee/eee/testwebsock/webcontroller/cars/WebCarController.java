@@ -1,5 +1,6 @@
 package ee.eee.testwebsock.webcontroller.cars;
 
+import ee.eee.testwebsock.properties.ApplicationProperties;
 import ee.eee.testwebsock.utils.CustomAuthenticationObject;
 import ee.eee.testwebsock.database.CarEntityRepository;
 import ee.eee.testwebsock.database.CarImplService;
@@ -36,6 +37,7 @@ public class WebCarController {
 	private final CarControllerUseCase carControllerUseCase;
 	private final CarImplService carImplService;
 	private final CarEntityRepository carEntityRepository;
+	private final ApplicationProperties properties;
 
 	@GetMapping
 	public List<CarRepresentationResponse> getCars() {
@@ -84,7 +86,7 @@ public class WebCarController {
 	@GetMapping("/image/{id}")
 	public Resource getImage(@PathVariable Long id) {
 		try {
-			Path path = Paths.get("ścieżka/do/zapisu/" + id);
+			Path path = Paths.get(properties.getPathToSave() + "/" + id);
 			Resource resource = new UrlResource(path.toUri());
 			if (resource.exists()) {
 				return resource;

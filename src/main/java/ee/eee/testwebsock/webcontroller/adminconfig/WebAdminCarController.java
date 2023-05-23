@@ -4,6 +4,7 @@ import ee.eee.testwebsock.database.CarEntityRepository;
 import ee.eee.testwebsock.database.CarImplService;
 import ee.eee.testwebsock.database.data.CarEntity;
 import ee.eee.testwebsock.database.data.CarStatusEntity;
+import ee.eee.testwebsock.properties.ApplicationProperties;
 import ee.eee.testwebsock.utils.WebControllerException;
 import ee.eee.testwebsock.webcontroller.adminconfig.requests.AddCarRequest;
 import ee.eee.testwebsock.websockets.websocket.car.CarControllerUseCase;
@@ -35,6 +36,7 @@ public class WebAdminCarController {
 	private final CarEntityRepository carRepository;
 	private final CarControllerUseCase carController;
 	private final CarImplService carImplService;
+	private final ApplicationProperties properties;
 
 	@GetMapping
 	public List<CarEntity> getAdminCars() {
@@ -104,7 +106,7 @@ public class WebAdminCarController {
 	                     @RequestParam("photo") MultipartFile file) {
 		try {
 			byte[] bytes = file.getBytes();
-			Path path = Paths.get("ścieżka/do/zapisu/" + id);
+			Path path = Paths.get(properties.getPathToSave() + "/" + id);
 			Files.write(path, bytes);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -113,26 +115,10 @@ public class WebAdminCarController {
 
 	}
 
-	@GetMapping("/image/{id}")
-	public Resource getImage(@PathVariable Long id) {
-		try {
-			Path path = Paths.get("ścieżka/do/zapisu/" + id);
-			Resource resource = new UrlResource(path.toUri());
-			if (resource.exists()) {
-				return resource;
-			} else {
-				throw new WebControllerException(COULD_NOT_FIND_FILE);
-			}
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-			throw new WebControllerException(COULD_NOT_FIND_FILE);
-		}
-	}
-
 	@DeleteMapping("/image/{id}")
 	public void deleteImage(@PathVariable Long id) {
 		try {
-			Path path = Paths.get("ścieżka/do/zapisu/" + id);
+			Path path = Paths.get(properties.getPathToSave() + "/" + id);
 			if (Files.exists(path)) {
 				Files.delete(path);
 			} else {

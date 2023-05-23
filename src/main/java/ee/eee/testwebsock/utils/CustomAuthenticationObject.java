@@ -28,6 +28,6 @@ public class CustomAuthenticationObject extends Jwt implements Principal {
 
 	@Override
 	public String getName() {
-		return "NAME";
+		return this.name;
 	}
 }

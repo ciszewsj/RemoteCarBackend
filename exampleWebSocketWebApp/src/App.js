@@ -14,7 +14,7 @@ function App() {
 
     let sendMessage = () => {
         if (ws) {
-            let a = JSON.stringify({type: "CONTROL_MESSAGE", data: {verticalSpeed: 1.0, horizontalSpeed: 1.0}})
+            let a = JSON.stringify({type: "CONTROL_MESSAGE", data: {verticalSpeed: 1.0, horizontalSpeed: 0.0}})
             console.log(a)
             ws.send(a)
         }
@@ -120,7 +120,7 @@ function App() {
                             console.log(e)
                         })
                     }
-                }}>RENT car
+                }}>Take steering
                 </button>
                 <p>
                     {obj && <h2>LEFT : {obj.lefTime}</h2>}
