@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.coobird.thumbnailator.Thumbnails;
 import org.imgscalr.Scalr;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
@@ -27,6 +28,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+import static ee.eee.testwebsock.utils.ImageObject.imageSizes;
 import static org.opencv.imgproc.Imgproc.INTER_AREA;
 import static org.opencv.imgproc.Imgproc.resize;
 
@@ -36,7 +38,7 @@ public class ImageResizerSpeedTest {
 
 	private BufferedImage bufferedImage;
 	private final ImageObject.ImageSize imageSize = ImageObject.ImageSize.P720;
-	private final int tries = 10;
+	private final int tries = 100;
 	private final String outputDir = Objects.requireNonNull(this.getClass().getClassLoader().getResource("")).getPath();
 
 	@BeforeEach
@@ -190,19 +192,19 @@ public class ImageResizerSpeedTest {
 	}
 
 	@Test
+	@Disabled
 	public void speedFullRescaleTest() throws IOException {
 		byte[] convertedImage = ImageResizer.bufferedImageToByteArray(bufferedImage);
 
 		Map<ImageObject.ImageSize, byte[]> imageMap = new HashMap<>();
+		ImageResizer imageResizer = new ImageResizer();
 		long result = 0L;
 		for (int i = 0; i < tries; i++) {
 			long timeStart = System.currentTimeMillis();
-			ImageObject imageObject = new ImageObject(convertedImage);
-			Arrays.stream(ImageObject.imageSizes)
-					.forEach(size -> imageMap.put(size, imageObject.getImageBySize(size)));
+			imageResizer.resizeImageOnMap(convertedImage);
 			result += System.currentTimeMillis() - timeStart;
 		}
-		Arrays.stream(ImageObject.imageSizes).forEach(size -> {
+		Arrays.stream(imageSizes).forEach(size -> {
 			File outputFile = new File(outputDir + "result/resultTest" + size.toString() + ".jpg");
 			try {
 				ImageIO.write(ImageResizer.byteArrayToBufferedImage(imageMap.get(size)), "jpg", outputFile);
@@ -211,7 +213,38 @@ public class ImageResizerSpeedTest {
 			}
 		});
 		log.info("TIME EXECUTED : {} / {} = {}", result, tries, result / tries);
+	}
 
+	@Test
+	public void speedFullRescaleParallelTest() throws IOException {
+		byte[] convertedImage = ImageResizer.bufferedImageToByteArray(bufferedImage);
+		ImageResizer resizer = new ImageResizer();
+		long result = 0L;
+		for (int i = 0; i < tries; i++) {
+			long timeStart = System.currentTimeMillis();
+			resizer.resizeImageOnMap(convertedImage);
+			result += System.currentTimeMillis() - timeStart;
+		}
+		log.info("TIME EXECUTED : {} / {} = {}", result, tries, result / tries);
+	}
+
+	@Test
+	public void speedFullRescaleMonadTest() throws IOException {
+		long result = 0L;
+		for (int i = 0; i < tries; i++) {
+			long timeStart = System.currentTimeMillis();
+			Map<ImageObject.ImageSize, byte[]> imageSizeMap = new HashMap<>();
+			Arrays.stream(imageSizes).forEach(size -> {
+				try {
+					imageSizeMap.put(size, ImageResizer.resizeImage(bufferedImage, size));
+				} catch (Exception e) {
+					e.printStackTrace();
+					imageSizeMap.put(size, null);
+				}
+			});
+			result += System.currentTimeMillis() - timeStart;
+		}
+		log.info("TIME EXECUTED : {} / {} = {}", result, tries, result / tries);
 	}
 
 }

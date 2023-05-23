@@ -9,10 +9,40 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.*;
 
 @Slf4j
 @Service
 public class ImageResizer {
+
+	private final ExecutorService executor;
+
+	public ImageResizer() {
+		executor = Executors.newFixedThreadPool(32);
+	}
+
+	public Map<ImageObject.ImageSize, byte[]> resizeImageOnMap(byte[] image) throws IOException {
+		BufferedImage bufferedImage = byteArrayToBufferedImage(image);
+		Map<ImageObject.ImageSize, Future<byte[]>> futureMap = new HashMap<>();
+		Arrays.stream(ImageObject.imageSizes).forEach(
+				size -> futureMap.put(size, executor.submit(() -> resizeImage(bufferedImage, size)))
+		);
+		Map<ImageObject.ImageSize, byte[]> resultMap = new HashMap<>();
+		Arrays.stream(ImageObject.imageSizes).forEach(
+				size -> {
+					try {
+						resultMap.put(size, futureMap.get(size).get(50, TimeUnit.MILLISECONDS));
+					} catch (InterruptedException | ExecutionException | TimeoutException e) {
+						resultMap.put(size, null);
+						e.printStackTrace();
+					}
+				});
+		return resultMap;
+	}
+
 
 	public static byte[] bufferedImageToByteArray(BufferedImage bufferedImage) throws IOException {
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();

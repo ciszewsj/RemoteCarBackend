@@ -24,7 +24,7 @@ public class UserController implements UserControllerUseCase {
 	private static final Set<WebSocketSession> clients = Collections.synchronizedSet(new HashSet<>());
 
 	ObjectMapper objectMapper = new ObjectMapper();
-
+	private final ImageResizer resizer;
 
 	@Override
 	public void addSession(WebSocketSession session) {
@@ -39,8 +39,7 @@ public class UserController implements UserControllerUseCase {
 	@Override
 	public void sendFrameToUsers(Long carId, String userRentId, String sessionId, Long leftTime, byte[] frame) {
 		try {
-			ImageObject imageObject = new ImageObject(frame);
-
+			Map<ImageObject.ImageSize, byte[]> frameMap = resizer.resizeImageOnMap(frame);
 
 			Arrays.stream(ImageObject.imageSizes)
 					.forEach(size -> {
@@ -51,7 +50,7 @@ public class UserController implements UserControllerUseCase {
 											new UserControlMessage<>(
 													UserControlMessage.UserControlMessageType.DISPLAY_MESSAGE,
 													UserFrameMessage.builder()
-															.frame(imageObject.getImageBySize(size))
+															.frame(frameMap.get(size))
 															.userRentId(userRentId)
 															.timeToEnd(leftTime)
 															.sessionSteeringId(sessionId)
