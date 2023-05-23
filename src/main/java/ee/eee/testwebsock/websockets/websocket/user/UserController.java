@@ -13,10 +13,7 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 import static ee.eee.testwebsock.utils.ImageObject.defaultImageSize;
 
@@ -41,7 +38,7 @@ public class UserController implements UserControllerUseCase {
 	}
 
 	@Override
-	public void sendFrameToUsers(Long carId, byte[] frame) {
+	public void sendFrameToUsers(Long carId, String userRentId, String sessionId, Long leftTime, byte[] frame) {
 
 		ImageObject imageObject = new ImageObject(frame, imageResizer);
 
@@ -55,6 +52,9 @@ public class UserController implements UserControllerUseCase {
 												UserControlMessage.UserControlMessageType.DISPLAY_MESSAGE,
 												UserFrameMessage.builder()
 														.frame(imageObject.getImageBySize(size))
+														.userRentId(userRentId)
+														.timeToEnd(leftTime)
+														.sessionSteeringId(sessionId)
 														.build()
 										)
 								)

@@ -100,7 +100,7 @@ public class CarClient {
 					CarControlMessage<?> carControlMessage = objectMapper.readValue(message.getPayload().toString(), CarControlMessage.class);
 					if (carControlMessage.getType().equals(CarControlMessage.CarControlMessageType.DISPLAY_MESSAGE)) {
 						CarFrameMessage frameMessage = objectMapper.convertValue(carControlMessage.getData(), CarFrameMessage.class);
-						userController.sendFrameToUsers(id, Base64.getDecoder().decode(frameMessage.getImage()));
+						userController.sendFrameToUsers(id, userId, websocketId, leftControlTime(), Base64.getDecoder().decode(frameMessage.getImage()));
 					} else if (carControlMessage.getType().equals(CarControlMessage.CarControlMessageType.INFO_MESSAGE)) {
 						log.info("Received info from car");
 					}
@@ -227,7 +227,19 @@ public class CarClient {
 	}
 
 	public long leftControlTime() {
-		return endTime - new Date().getTime();
+		if (endTime == null) {
+			return 0;
+		}
+		long left = endTime - new Date().getTime();
+		if (left < 0) {
+			if (websocketId != null) {
+				websocketId = null;
+			}
+			if (userId != null) {
+				userId = null;
+			}
+		}
+		return left < 0 ? 0 : left;
 	}
 
 	public boolean isConnected() {
