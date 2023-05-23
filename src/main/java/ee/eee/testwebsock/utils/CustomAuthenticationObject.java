@@ -22,7 +22,7 @@ public class CustomAuthenticationObject extends Jwt implements Principal {
 		super(tokenValue, issuedAt, expiresAt, headers, claims);
 
 		this.email = claims.get("email").toString();
-		this.id = claims.get("sid").toString();
+		this.id = claims.get("sub").toString();
 		this.name = claims.get("name").toString();
 	}
 
