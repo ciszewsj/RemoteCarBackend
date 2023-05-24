@@ -17,7 +17,7 @@ services:
       app-network:
         ipv4_address: 192.168.15.2
 
-  spring:
+  spring2:
     build: .
     ports:
       - "8081:8081"
@@ -27,7 +27,7 @@ services:
       app-network:
         ipv4_address: 192.168.15.3
     volumes:
-      - ./docker/spring-app/application.properties:/app/src/main/resources/application.properties
+      - ./docker/keycloack/spring-app/application.properties:/app/application.properties
 
   nginx:
     image: nginx:latest
@@ -36,7 +36,7 @@ services:
     volumes:
       - ./docker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
     depends_on:
-      - spring
+#      - spring2
       - keycloak-carapp
     networks:
       app-network:

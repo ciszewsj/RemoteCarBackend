@@ -1,5 +1,6 @@
 package ee.eee.testwebsock.webcontroller.user;
 
+import ee.eee.testwebsock.properties.KeycloakProperties;
 import ee.eee.testwebsock.utils.WebControllerException;
 import ee.eee.testwebsock.webcontroller.user.requests.RegisterUserRequest;
 import lombok.RequiredArgsConstructor;
@@ -23,10 +24,19 @@ import java.util.List;
 @RequiredArgsConstructor
 public class WebUserController {
 	private final RealmResource realm;
+	private final KeycloakProperties keycloakProperties;
+
+	@GetMapping
+	public String test() {
+		return keycloakProperties.getServerUrl();
+	}
 
 	@PostMapping
 	public void register(@Validated @RequestBody RegisterUserRequest request) {
 		try {
+
+			log.info("{}", request.getName());
+
 			UserRepresentation userRepresentation = new UserRepresentation();
 
 			userRepresentation.setUsername(request.getName());
@@ -49,6 +59,8 @@ public class WebUserController {
 							.filter(roleRepresentation -> roleRepresentation.getName().contains("app_user")).findFirst().orElseThrow();
 			userResource.roles().realmLevel().add(List.of(roleRepresentationList));
 		} catch (Exception e) {
+			e.printStackTrace();
+			log.error("WTF > ? ", e);
 			throw new WebControllerException(WebControllerException.ExceptionStatus.COULD_NOT_REGISTER_USER);
 		}
 	}
