@@ -23,7 +23,7 @@ public class CustomAuthenticationObject extends Jwt implements Principal {
 
 		this.email = claims.get("email").toString();
 		this.id = claims.get("sub").toString();
-		this.name = claims.get("name").toString();
+		this.name = claims.get("preferred_username").toString();
 	}
 
 	@Override

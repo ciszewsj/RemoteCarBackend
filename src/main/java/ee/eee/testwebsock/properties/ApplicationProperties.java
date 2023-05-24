@@ -13,6 +13,6 @@ public class ApplicationProperties {
 	private int tickRate = 20;
 	private long maxMessageDelay = 500;
 	private Long timeForRent = 3L * 60 * 1000;
-	private String pathToSave = "ścieżka/do/zapisu/";
+	private String pathToSave = "C:\\Study\\imagesTest";
 
 }

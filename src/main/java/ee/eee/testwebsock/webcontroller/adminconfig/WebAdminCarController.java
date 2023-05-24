@@ -83,6 +83,11 @@ public class WebAdminCarController {
 		}
 		carController.deleteCar(id);
 		carRepository.delete(car);
+		try {
+			deleteImage(id);
+		} catch (Exception e) {
+			log.info(e.toString());
+		}
 	}
 
 	@PostMapping("/start/{id}")
@@ -104,9 +109,11 @@ public class WebAdminCarController {
 	@PostMapping("/image/{id}")
 	public void addImage(@PathVariable Long id,
 	                     @RequestParam("photo") MultipartFile file) {
+		carRepository.findById(id)
+				.orElseThrow(new WebControllerException(WebControllerException.ExceptionStatus.CAR_NOT_FOUND));
 		try {
 			byte[] bytes = file.getBytes();
-			Path path = Paths.get(properties.getPathToSave() + "/" + id);
+			Path path = Paths.get(properties.getPathToSave() + "/" + id + ".png");
 			Files.write(path, bytes);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -118,7 +125,7 @@ public class WebAdminCarController {
 	@DeleteMapping("/image/{id}")
 	public void deleteImage(@PathVariable Long id) {
 		try {
-			Path path = Paths.get(properties.getPathToSave() + "/" + id);
+			Path path = Paths.get(properties.getPathToSave() + "/" + id + ".png");
 			if (Files.exists(path)) {
 				Files.delete(path);
 			} else {

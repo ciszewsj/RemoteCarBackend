@@ -11,14 +11,19 @@ import ee.eee.testwebsock.webcontroller.cars.requests.CarRentRequest;
 import ee.eee.testwebsock.webcontroller.cars.responses.CarConfigResponse;
 import ee.eee.testwebsock.webcontroller.cars.responses.CarRepresentationResponse;
 import ee.eee.testwebsock.websockets.websocket.car.CarControllerUseCase;
+import jdk.jfr.ContentType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.util.StreamUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.print.attribute.standard.Media;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -83,17 +88,17 @@ public class WebCarController {
 				.build();
 	}
 
-	@GetMapping("/image/{id}")
-	public Resource getImage(@PathVariable Long id) {
+	@GetMapping(value = "/image/{id}", produces = MediaType.IMAGE_PNG_VALUE)
+	public byte[] getImage(@PathVariable Long id) {
 		try {
-			Path path = Paths.get(properties.getPathToSave() + "/" + id);
+			Path path = Paths.get(properties.getPathToSave() + "/" + id + ".png");
 			Resource resource = new UrlResource(path.toUri());
 			if (resource.exists()) {
-				return resource;
+				return StreamUtils.copyToByteArray(resource.getInputStream());
 			} else {
 				throw new WebControllerException(COULD_NOT_FIND_FILE);
 			}
-		} catch (MalformedURLException e) {
+		} catch (IOException e) {
 			e.printStackTrace();
 			throw new WebControllerException(COULD_NOT_FIND_FILE);
 		}
