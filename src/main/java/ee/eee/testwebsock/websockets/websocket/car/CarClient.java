@@ -223,6 +223,8 @@ public class CarClient {
 	}
 
 	public void rentCar(String userId) {
+		Long time = new Date().getTime();
+		log.info("Try rent car by {}, endtime {} current {}", userId, endTime, time);
 		if (endTime == null || endTime < new Date().getTime()) {
 			websocketId = null;
 			this.userId = userId;
