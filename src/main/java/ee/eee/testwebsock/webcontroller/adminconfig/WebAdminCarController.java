@@ -103,12 +103,12 @@ public class WebAdminCarController {
 		carController.releaseCar(id);
 	}
 
-	@PostMapping("/forcestop/{id}")
+	@PostMapping("/force_stop/{id}")
 	public void forceStopCar(@PathVariable Long id) {
 		if (!carController.isCarRunning(id)) {
 			throw new WebControllerException(WebControllerException.ExceptionStatus.CAR_IS_NOT_RUNNING);
 		}
-		carController.releaseCar(id);
+		carController.forceReleaseCar(id);
 	}
 
 	@PostMapping("/image/{id}")
