@@ -2,6 +2,7 @@ package ee.eee.testwebsock.websockets.websocket.car;
 
 import ee.eee.testwebsock.database.CarImplService;
 import ee.eee.testwebsock.database.data.CarEntity;
+import ee.eee.testwebsock.properties.ApplicationProperties;
 import ee.eee.testwebsock.utils.WebControllerException;
 import ee.eee.testwebsock.websockets.data.ControlMessage;
 import ee.eee.testwebsock.websockets.websocket.user.UserControllerUseCase;
@@ -20,10 +21,17 @@ public class CarController implements CarControllerUseCase {
 	private final Map<Long, CarClient> carClientMap = new HashMap<>();
 	private final UserControllerUseCase userControllerUseCase;
 	private final CarImplService carImplService;
+	private final ApplicationProperties properties;
 
 	@Override
 	public void addNewCar(CarEntity car) {
-		CarClient carClient = new CarClient(car.getId(), car.getUrl(), userControllerUseCase, carImplService);
+		CarClient carClient = new CarClient(car.getId(),
+				car.getUrl(),
+				userControllerUseCase,
+				carImplService,
+				properties.getTimeForRent(),
+				properties.getTickRate(),
+				properties.getMaxMessageDelay());
 		carClientMap.put(car.getId(), carClient);
 	}
 

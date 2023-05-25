@@ -4,12 +4,14 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ee.eee.testwebsock.database.CarImplService;
 import ee.eee.testwebsock.database.data.CarStatusEntity;
+import ee.eee.testwebsock.properties.ApplicationProperties;
 import ee.eee.testwebsock.utils.WebControllerException;
 import ee.eee.testwebsock.websockets.data.ControlMessage;
 import ee.eee.testwebsock.websockets.data.car.CarConfigMessage;
 import ee.eee.testwebsock.websockets.data.car.CarControlMessage;
 import ee.eee.testwebsock.websockets.data.car.CarFrameMessage;
 import ee.eee.testwebsock.websockets.websocket.user.UserControllerUseCase;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.socket.*;
 import org.springframework.web.socket.client.WebSocketClient;
@@ -27,9 +29,8 @@ public class CarClient {
 	private URI uri;
 	private final Long id;
 
-
-	private final int tickRate = 20;
-	private final long maxMessageDelay = 500;
+	private final int tickRate;
+	private final long maxMessageDelay;
 	private Long currentMessageTime;
 	private ControlMessage currentControlMessage;
 
@@ -49,9 +50,15 @@ public class CarClient {
 	private String websocketId;
 	private Long endTime;
 
-	private static final Long timeForRent = 3L * 60 * 1000;
+	private final Long timeForRent;
 
-	public CarClient(Long id, String uri, UserControllerUseCase userController, CarImplService carImplService) {
+	public CarClient(Long id,
+	                 String uri,
+	                 UserControllerUseCase userController,
+	                 CarImplService carImplService,
+	                 Long timeForRent,
+	                 Integer tickRate,
+	                 Long maxMessageDelay) {
 		this.id = id;
 		try {
 			this.uri = new URI(uri);
@@ -66,6 +73,9 @@ public class CarClient {
 		this.currentMessageTime = 0L;
 		this.carImplService = carImplService;
 		this.objectMapper = new ObjectMapper();
+		this.timeForRent = timeForRent;
+		this.tickRate = tickRate;
+		this.maxMessageDelay = maxMessageDelay;
 	}
 
 	private WebSocketHandler webSocketHandler() {
