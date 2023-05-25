@@ -103,6 +103,14 @@ public class WebAdminCarController {
 		carController.releaseCar(id);
 	}
 
+	@PostMapping("/forcestop/{id}")
+	public void forceStopCar(@PathVariable Long id) {
+		if (!carController.isCarRunning(id)) {
+			throw new WebControllerException(WebControllerException.ExceptionStatus.CAR_IS_NOT_RUNNING);
+		}
+		carController.releaseCar(id);
+	}
+
 	@PostMapping("/image/{id}")
 	public void addImage(@PathVariable Long id,
 	                     @RequestParam("photo") MultipartFile file) {

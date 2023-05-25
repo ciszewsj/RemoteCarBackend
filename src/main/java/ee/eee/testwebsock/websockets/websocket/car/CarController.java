@@ -47,6 +47,11 @@ public class CarController implements CarControllerUseCase {
 
 	@Override
 	public void releaseCar(Long id) {
+		getCarWSById(id).release();
+	}
+
+	@Override
+	public void forceReleaseCar(Long id) {
 		getCarWSById(id).disconnect();
 	}
 

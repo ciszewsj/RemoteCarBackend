@@ -48,6 +48,8 @@ public class CarClient {
 	private String websocketId;
 	private Long endTime;
 
+	private Boolean isStopped = true;
+
 	private final Long timeForRent;
 
 	public CarClient(Long id,
@@ -142,6 +144,7 @@ public class CarClient {
 
 			carImplService.turnCarOn(id);
 			carImplService.addCarStatus(id, CarStatusEntity.Status.CONNECTED);
+			isStopped = false;
 		} catch (ExecutionException | InterruptedException e) {
 			log.error("Could not start car", e);
 
@@ -159,6 +162,7 @@ public class CarClient {
 
 			socketSession.close();
 			controlFuture.cancel(true);
+			isStopped = true;
 		} catch (IOException e) {
 			log.error("Could not stop car", e);
 			throw new WebControllerException(WebControllerException.ExceptionStatus.CAR_STOP_ERROR);
@@ -185,6 +189,10 @@ public class CarClient {
 	private ScheduledFuture<?> controlFunction() {
 		ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 		return executor.scheduleAtFixedRate(() -> {
+			if (isStopped && endTime < new Date().getTime()) {
+				disconnect();
+				return;
+			}
 			try {
 				if (new Date().getTime() > currentMessageTime + maxMessageDelay) {
 					carControlMessage.setData(new ControlMessage());
@@ -252,5 +260,9 @@ public class CarClient {
 	public boolean isConnected() {
 		log.info("socket session {}", socketSession);
 		return socketSession != null && socketSession.isOpen();
+	}
+
+	public void release() {
+		isStopped = true;
 	}
 }
