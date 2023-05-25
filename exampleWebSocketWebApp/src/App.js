@@ -21,7 +21,7 @@ function App() {
     }
 
     useEffect(() => {
-        let url = 'ws://localhost:8081/cars/1'
+        let url = 'ws://192.168.8.90:8081/cars/1'
         console.log("Execute?")
         let headers = JSON.stringify({
             token: 'My-little-token'

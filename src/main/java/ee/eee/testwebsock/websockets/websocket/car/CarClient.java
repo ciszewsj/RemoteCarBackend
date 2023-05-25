@@ -9,6 +9,8 @@ import ee.eee.testwebsock.websockets.data.ControlMessage;
 import ee.eee.testwebsock.websockets.data.car.CarConfigMessage;
 import ee.eee.testwebsock.websockets.data.car.CarControlMessage;
 import ee.eee.testwebsock.websockets.data.car.CarFrameMessage;
+import ee.eee.testwebsock.websockets.data.user.UserControlMessage;
+import ee.eee.testwebsock.websockets.data.user.UserInfoMessage;
 import ee.eee.testwebsock.websockets.websocket.user.UserControllerUseCase;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.socket.*;
@@ -126,9 +128,7 @@ public class CarClient {
 			@Override
 			public void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus) {
 				log.warn("Car websocket session is closed");
-				carImplService.addCarStatus(id, CarStatusEntity.Status.DISCONNECTED);
-				socketSession = null;
-				controlFuture.cancel(true);
+				disconnect();
 			}
 
 			@Override
@@ -264,5 +264,14 @@ public class CarClient {
 
 	public void release() {
 		isStopped = true;
+	}
+
+
+	private void sendDisconnectToUsers() {
+		UserControlMessage<UserInfoMessage> controlMessage = new UserControlMessage<>(
+				UserControlMessage.UserControlMessageType.INFO_MESSAGE,
+				UserInfoMessage.builder()
+						.msg(UserInfoMessage.UserInfoType.CAR_DISCONNECTED)
+						.build());
 	}
 }
