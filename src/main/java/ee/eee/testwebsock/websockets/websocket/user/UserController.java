@@ -65,10 +65,9 @@ public class UserController implements UserControllerUseCase {
 						try {
 							clients.forEach(client -> {
 								try {
-
 									if ((long) client.getAttributes().get("carId") == carId) {
 										if ((client.getAttributes().get("resolution") == null && size == defaultImageSize)
-												|| size.toString().equals(client.getAttributes().get("resolution"))) {
+												|| size.equals(client.getAttributes().get("resolution"))) {
 											client.sendMessage(message);
 										}
 									}

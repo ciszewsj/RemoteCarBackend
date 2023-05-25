@@ -3,6 +3,7 @@ package ee.eee.testwebsock.websockets.websocket.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ee.eee.testwebsock.websockets.data.ControlMessage;
+import ee.eee.testwebsock.websockets.data.user.ConfigFrameMessage;
 import ee.eee.testwebsock.websockets.data.user.UserControlMessage;
 import ee.eee.testwebsock.websockets.data.user.UserInfoMessage;
 import ee.eee.testwebsock.websockets.websocket.car.CarControllerUseCase;
@@ -75,6 +76,11 @@ public class WebSocketCarHandler implements WebSocketHandler {
 				log.info("SPEED : {} - {}", controlMessage.getHorizontalSpeed(), controlMessage.getVerticalSpeed());
 				log.info(session.getId());
 				carController.controlCar((long) session.getAttributes().get("carId"), controlMessage, session.getId());
+			} else if (userControlMessage.getType().equals(UserControlMessage.UserControlMessageType.CONFIG_MESSAGE)) {
+				ConfigFrameMessage controlMessage = objectMapper.convertValue(userControlMessage.getData(), ConfigFrameMessage.class);
+				log.info("Size : {}", controlMessage.getSize());
+				log.info(session.getId());
+				session.getAttributes().put("resolution", controlMessage.getSize());
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

@@ -15,6 +15,7 @@ public class UserControlMessage<T> {
 		CONTROL_MESSAGE,
 		DISPLAY_MESSAGE,
 		INFO_MESSAGE,
-		GET_CONTROL
+		GET_CONTROL,
+		CONFIG_MESSAGE
 	}
 }

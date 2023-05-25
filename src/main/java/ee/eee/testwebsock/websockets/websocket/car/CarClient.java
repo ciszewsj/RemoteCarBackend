@@ -4,14 +4,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ee.eee.testwebsock.database.CarImplService;
 import ee.eee.testwebsock.database.data.CarStatusEntity;
-import ee.eee.testwebsock.properties.ApplicationProperties;
 import ee.eee.testwebsock.utils.WebControllerException;
 import ee.eee.testwebsock.websockets.data.ControlMessage;
 import ee.eee.testwebsock.websockets.data.car.CarConfigMessage;
 import ee.eee.testwebsock.websockets.data.car.CarControlMessage;
 import ee.eee.testwebsock.websockets.data.car.CarFrameMessage;
 import ee.eee.testwebsock.websockets.websocket.user.UserControllerUseCase;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.socket.*;
 import org.springframework.web.socket.client.WebSocketClient;
@@ -105,7 +103,6 @@ public class CarClient {
 
 			@Override
 			public void handleMessage(WebSocketSession session, WebSocketMessage<?> message) {
-//				log.info("Received message : {}", message.getPayload());
 				try {
 					CarControlMessage<?> carControlMessage = objectMapper.readValue(message.getPayload().toString(), CarControlMessage.class);
 					if (carControlMessage.getType().equals(CarControlMessage.CarControlMessageType.DISPLAY_MESSAGE)) {
@@ -254,7 +251,6 @@ public class CarClient {
 
 	public boolean isConnected() {
 		log.info("socket session {}", socketSession);
-
 		return socketSession != null && socketSession.isOpen();
 	}
 }
