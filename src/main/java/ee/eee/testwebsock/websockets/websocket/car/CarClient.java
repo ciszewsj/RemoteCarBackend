@@ -9,8 +9,6 @@ import ee.eee.testwebsock.websockets.data.ControlMessage;
 import ee.eee.testwebsock.websockets.data.car.CarConfigMessage;
 import ee.eee.testwebsock.websockets.data.car.CarControlMessage;
 import ee.eee.testwebsock.websockets.data.car.CarFrameMessage;
-import ee.eee.testwebsock.websockets.data.user.UserControlMessage;
-import ee.eee.testwebsock.websockets.data.user.UserInfoMessage;
 import ee.eee.testwebsock.websockets.websocket.user.UserControllerUseCase;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.socket.*;
@@ -70,7 +68,7 @@ public class CarClient {
 		this.userController = userController;
 		this.client = new StandardWebSocketClient();
 
-		this.webSocketHandler = webSocketHandler();
+		this.webSocketHandler = webSocketHandler(this.id);
 
 		this.currentMessageTime = 0L;
 		this.carImplService = carImplService;
@@ -80,7 +78,7 @@ public class CarClient {
 		this.maxMessageDelay = maxMessageDelay;
 	}
 
-	private WebSocketHandler webSocketHandler() {
+	private WebSocketHandler webSocketHandler(Long id) {
 		return new WebSocketHandler() {
 			@Override
 			public void afterConnectionEstablished(WebSocketSession session) {
@@ -128,7 +126,7 @@ public class CarClient {
 			@Override
 			public void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus) {
 				log.warn("Car websocket session is closed");
-				disconnect();
+				userController.closeCar(id);
 			}
 
 			@Override
@@ -187,6 +185,7 @@ public class CarClient {
 	}
 
 	private ScheduledFuture<?> controlFunction() {
+		log.info("INITED CONTROL FUNCTION");
 		ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 		return executor.scheduleAtFixedRate(() -> {
 			if (isStopped && endTime < new Date().getTime()) {
@@ -205,7 +204,6 @@ public class CarClient {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-
 		}, 0, 1000 / tickRate, TimeUnit.MILLISECONDS);
 	}
 
@@ -266,14 +264,5 @@ public class CarClient {
 
 	public void release() {
 		isStopped = true;
-	}
-
-
-	private void sendDisconnectToUsers() {
-		UserControlMessage<UserInfoMessage> controlMessage = new UserControlMessage<>(
-				UserControlMessage.UserControlMessageType.INFO_MESSAGE,
-				UserInfoMessage.builder()
-						.msg(UserInfoMessage.UserInfoType.CAR_DISCONNECTED)
-						.build());
 	}
 }

@@ -6,6 +6,7 @@ import ee.eee.testwebsock.utils.ImageObject;
 import ee.eee.testwebsock.utils.ImageResizer;
 import ee.eee.testwebsock.websockets.data.user.UserControlMessage;
 import ee.eee.testwebsock.websockets.data.user.UserFrameMessage;
+import ee.eee.testwebsock.websockets.data.user.UserInfoMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -80,6 +81,37 @@ public class UserController implements UserControllerUseCase {
 						}
 					});
 		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Override
+	public void closeCar(Long carId) {
+		UserControlMessage<UserInfoMessage> controlMessage = new UserControlMessage<>(
+				UserControlMessage.UserControlMessageType.INFO_MESSAGE,
+				UserInfoMessage.builder()
+						.msg(UserInfoMessage.UserInfoType.CAR_DISCONNECTED)
+						.build());
+		TextMessage message;
+		try {
+			message = new TextMessage(objectMapper.writeValueAsString(controlMessage));
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+			return;
+		}
+
+		try {
+			clients.forEach(client -> {
+				try {
+					if ((long) client.getAttributes().get("carId") == carId) {
+						client.sendMessage(message);
+						client.close();
+					}
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			});
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}

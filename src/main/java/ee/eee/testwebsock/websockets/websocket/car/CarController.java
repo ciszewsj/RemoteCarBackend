@@ -47,6 +47,9 @@ public class CarController implements CarControllerUseCase {
 
 	@Override
 	public void releaseCar(Long id) {
+		if (isCarFree(id)) {
+			getCarWSById(id).disconnect();
+		}
 		getCarWSById(id).release();
 	}
 
@@ -100,7 +103,7 @@ public class CarController implements CarControllerUseCase {
 
 	@Override
 	public boolean isCarFree(Long id) {
-		return false;
+		return carClientMap.get(id).leftControlTime() > 0;
 	}
 
 	@Override

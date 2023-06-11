@@ -9,4 +9,5 @@ public interface UserControllerUseCase {
 
 	void sendFrameToUsers(Long carId, String userRentId, String sessionId, Long leftTime, byte[] frame);
 
+	void closeCar(Long carId);
 }

@@ -30,6 +30,7 @@ services:
       - ./docker/keycloack/spring-app/application.properties:/app/application.properties
 
   react:
+#    build: ./remote_car_frontend
     build: ./exampleWebSocketWebApp
     ports:
       - "3000:80"

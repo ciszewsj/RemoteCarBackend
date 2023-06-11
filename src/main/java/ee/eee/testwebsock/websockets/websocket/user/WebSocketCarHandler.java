@@ -72,7 +72,7 @@ public class WebSocketCarHandler implements WebSocketHandler {
 
 			UserControlMessage<?> userControlMessage = objectMapper.readValue(message.getPayload().toString(), UserControlMessage.class);
 			if (userControlMessage.getType().equals(UserControlMessage.UserControlMessageType.CONTROL_MESSAGE)) {
-				ControlMessage controlMessage = objectMapper.convertValue(userControlMessage.getData(), ControlMessage.class);
+				ControlMessage controlMessage = ControlMessage.normalizeControlMessage(objectMapper.convertValue(userControlMessage.getData(), ControlMessage.class));
 				log.info("SPEED : {} - {}", controlMessage.getHorizontalSpeed(), controlMessage.getVerticalSpeed());
 				log.info(session.getId());
 				carController.controlCar((long) session.getAttributes().get("carId"), controlMessage, session.getId());
