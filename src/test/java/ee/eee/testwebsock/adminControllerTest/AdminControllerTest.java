@@ -1,13 +1,11 @@
-package ee.eee.testwebsock.userControllerTest;
+package ee.eee.testwebsock.adminControllerTest;
 
 import ee.eee.testwebsock.database.CarEntityRepository;
 import ee.eee.testwebsock.database.CarImplService;
 import ee.eee.testwebsock.database.data.CarEntity;
 import ee.eee.testwebsock.properties.ApplicationProperties;
 import ee.eee.testwebsock.utils.CustomAuthenticationObject;
-import ee.eee.testwebsock.webcontroller.cars.WebCarController;
-import ee.eee.testwebsock.webcontroller.cars.requests.CarRentRequest;
-import ee.eee.testwebsock.webcontroller.cars.responses.CarRepresentationResponse;
+import ee.eee.testwebsock.webcontroller.adminconfig.WebAdminCarController;
 import ee.eee.testwebsock.websockets.websocket.car.CarControllerUseCase;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
@@ -17,11 +15,10 @@ import org.mockito.Mockito;
 
 import java.util.Optional;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 
 @Slf4j
-public class userControllerTest {
+public class AdminControllerTest {
 
 	CarControllerUseCase carControllerUseCase;
 	CarImplService carImplService;
@@ -29,7 +26,7 @@ public class userControllerTest {
 	ApplicationProperties properties;
 	CustomAuthenticationObject authenticationObject;
 
-	WebCarController carController;
+	WebAdminCarController carController;
 
 	@BeforeEach
 	public void beforeTest() {
@@ -40,7 +37,7 @@ public class userControllerTest {
 		authenticationObject = Mockito.mock(CustomAuthenticationObject.class);
 		Mockito.when(authenticationObject.getId()).thenReturn("userId");
 
-		carController = new WebCarController(carControllerUseCase, carImplService, carEntityRepository, properties);
+		carController = new WebAdminCarController(carEntityRepository, carControllerUseCase, carImplService, properties);
 	}
 
 
@@ -60,29 +57,30 @@ public class userControllerTest {
 		Mockito.when(carControllerUseCase.isCarRunning(anyLong())).thenReturn(true);
 		Mockito.when(carControllerUseCase.leftControlTime(anyLong())).thenReturn(0L);
 
-		CarRepresentationResponse response = carController.getCar(id);
+		CarEntity response = carController.getAdminCar(id);
 
 		Assertions.assertEquals(response.getId(), id);
-		Assertions.assertEquals(response.getCarName(), name);
-		Assertions.assertEquals(response.getLeftRentedTime(), 0L);
-		Assertions.assertEquals(response.getIsCarRunning(), true);
-		Assertions.assertEquals(response.getIsCarFree(), true);
 	}
 
 	@Test
-	public void rentCar() {
+	public void startCar() {
 		Long id = 0L;
-
-		carController.rentCar(id, authenticationObject);
-
-		Mockito.verify(carImplService, Mockito.times(1)).addCarStatus(Mockito.anyLong(), Mockito.any());
+		carController.startCar(id);
 	}
 
 	@Test
-	public void takeControl() {
+	public void stopCar() {
 		Long id = 0L;
-		CarRentRequest request = new CarRentRequest();
+		Mockito.when(carControllerUseCase.isCarRunning(anyLong())).thenReturn(true);
 
-		carController.takeControl(id, request, authenticationObject);
+		carController.stopCar(id);
+	}
+
+	@Test
+	public void forceStopCar() {
+		Long id = 0L;
+		Mockito.when(carControllerUseCase.isCarRunning(anyLong())).thenReturn(true);
+
+		carController.forceStopCar(id);
 	}
 }
