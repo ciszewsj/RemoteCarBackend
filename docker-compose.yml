@@ -29,14 +29,14 @@ services:
     volumes:
       - ./docker/keycloack/spring-app/application.properties:/app/application.properties
 
-  react:
-#    build: ./remote_car_frontend
-    build: ./exampleWebSocketWebApp
-    ports:
-      - "3000:80"
-    networks:
-      app-network:
-        ipv4_address: 192.168.15.5
+#  react:
+##    build: ./remote_car_frontend
+#    build: ./exampleWebSocketWebApp
+#    ports:
+#      - "3000:80"
+#    networks:
+#      app-network:
+#        ipv4_address: 192.168.15.5
 
   nginx:
     image: nginx:latest
@@ -45,7 +45,7 @@ services:
     volumes:
       - ./docker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
     depends_on:
-      - react
+#      - react
       - spring2
       - keycloak-carapp
     networks:

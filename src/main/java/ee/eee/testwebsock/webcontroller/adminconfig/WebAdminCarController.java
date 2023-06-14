@@ -20,8 +20,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
-import static ee.eee.testwebsock.utils.WebControllerException.ExceptionStatus.COULD_NOT_FIND_FILE;
-import static ee.eee.testwebsock.utils.WebControllerException.ExceptionStatus.COULD_NOT_SAVE_FILE;
+import static ee.eee.testwebsock.utils.WebControllerException.ExceptionStatus.*;
 
 @Slf4j
 @RestController
@@ -62,6 +61,11 @@ public class WebAdminCarController {
 	public Long updateCar(@PathVariable Long id, @Validated @RequestBody AddCarRequest addCarRequest) {
 		CarEntity car = carRepository.findById(id)
 				.orElseThrow(new WebControllerException(WebControllerException.ExceptionStatus.CAR_NOT_FOUND));
+
+		if (carController.isCarRunning(id)) {
+			throw new WebControllerException(COULD_NOT_CONFIGURE_CAR_WHILE_RUNNING);
+		}
+
 		car.setName(addCarRequest.getName());
 		car.setUrl(addCarRequest.getUrl());
 
@@ -113,7 +117,7 @@ public class WebAdminCarController {
 
 	@PostMapping("/image/{id}")
 	public void addImage(@PathVariable Long id,
-	                     @RequestParam("photo") MultipartFile file) {
+	                     @RequestPart("photo") MultipartFile file) {
 		carRepository.findById(id)
 				.orElseThrow(new WebControllerException(WebControllerException.ExceptionStatus.CAR_NOT_FOUND));
 		try {
